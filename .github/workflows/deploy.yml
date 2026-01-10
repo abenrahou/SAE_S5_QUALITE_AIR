@@ -27,17 +27,26 @@ jobs:
 
       - run: npm ci
 
-      # IMPORTANT: base-href = /NOM_DU_REPO/
       - run: npm run build -- --configuration production --base-href "/SAE_S5_QUALITE_AIR/"
 
-      # SPA fallback (utile si tu as du routing Angular)
       - run: |
-          DIST_DIR="$(ls -d dist/* | head -n 1)"
+          DIST_DIR="$(ls -d dist/*/browser 2>/dev/null | head -n 1)"
+          if [ -z "$DIST_DIR" ]; then
+            DIST_DIR="$(ls -d dist/* | head -n 1)"
+          fi
+
+          echo "DIST_DIR=$DIST_DIR" >> $GITHUB_ENV
+
+          echo "Using DIST_DIR=$DIST_DIR"
+          ls -la "$DIST_DIR"
+          test -f "$DIST_DIR/index.html"
+
           cp "$DIST_DIR/index.html" "$DIST_DIR/404.html"
+          touch "$DIST_DIR/.nojekyll"
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: ${{ env.DIST_DIR }}
 
   deploy:
     needs: build
