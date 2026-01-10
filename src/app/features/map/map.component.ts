@@ -209,6 +209,12 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     const pollutionData = this.dataService.getPollutionData();
     const annualData = this.dataService.getAnnualData();
 
+    console.log('[Map] Data loaded:', {
+      cities: cities.length,
+      pollutionRows: pollutionData.length,
+      annualRows: annualData.length
+    });
+
     this.buildPollutionIndex(pollutionData);
     this.annualData = annualData;
     this.totalCities.set(cities.length);
@@ -328,6 +334,15 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     const displayType = this.displayType();
     const leaflet = L as unknown as LeafletExtended;
 
+    console.log('[Map] Render layers:', {
+      displayType,
+      pollutant,
+      selectedYear,
+      cityCount: cities.length,
+      heatAvailable: Boolean(leaflet.heatLayer),
+      clusterAvailable: Boolean(leaflet.markerClusterGroup)
+    });
+
     if (displayType === 'heatmap' && leaflet.heatLayer) {
       const points: HeatPoint[] = cities.map(city => ([
         city.latitude,
@@ -335,6 +350,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         this.getPollutionValue(city.cityName, pollutant, selectedYear) || 0
       ]));
 
+      console.log('[Map] Heat points:', points.length);
       this.heatLayer = leaflet.heatLayer(points, {
         radius: 25,
         blur: 18,
@@ -360,6 +376,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       marker.addTo(clusterGroup);
     });
 
+    console.log('[Map] Marker layer added:', cities.length);
     this.markerLayer = clusterGroup.addTo(this.map);
   }
 
