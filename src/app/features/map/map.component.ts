@@ -268,6 +268,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private async ensureLeafletPlugins(): Promise<void> {
     try {
+      const globalScope = globalThis as typeof globalThis & { L?: typeof L };
+      globalScope.L = L;
       await import('leaflet.markercluster');
       await import('leaflet.heat');
       const leaflet = L as unknown as LeafletExtended;
