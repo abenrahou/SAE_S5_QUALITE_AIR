@@ -14,8 +14,6 @@ import { CommonModule, DOCUMENT } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as L from 'leaflet';
-import 'leaflet.markercluster';
-import 'leaflet.heat';
 import { DataService, DatasetRow } from '../../core/services/data.service';
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
 import { City, Indicator, PollutionData, PollutantType, POLLUTANT_INFO } from '../../core/models';
@@ -129,7 +127,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    this.initializeMap();
+    void this.initializeMap();
   }
 
   ngOnDestroy(): void {
@@ -229,10 +227,11 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dataReady.set(true);
   }
 
-  private initializeMap(): void {
+  private async initializeMap(): Promise<void> {
     if (!this.mapContainer?.nativeElement) return;
     if (this.map) return;
 
+    await this.ensureLeafletPlugins();
     const assetInfo = this.configureLeafletAssets();
     console.log('[Map] Base href:', this.document.baseURI);
     console.log('[Map] Leaflet icons:', assetInfo);
@@ -265,6 +264,20 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     console.log('[Map] Map ready');
 
     setTimeout(() => this.map?.invalidateSize(), 0);
+  }
+
+  private async ensureLeafletPlugins(): Promise<void> {
+    try {
+      await import('leaflet.markercluster');
+      await import('leaflet.heat');
+      const leaflet = L as unknown as LeafletExtended;
+      console.log('[Map] Plugins ready:', {
+        heatAvailable: Boolean(leaflet.heatLayer),
+        clusterAvailable: Boolean(leaflet.markerClusterGroup)
+      });
+    } catch (error) {
+      console.warn('[Map] Plugin load error:', error);
+    }
   }
 
   private configureLeafletAssets(): { iconUrl: string; iconRetinaUrl: string; shadowUrl: string } | null {
