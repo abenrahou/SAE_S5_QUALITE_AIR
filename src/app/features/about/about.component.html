@@ -1,0 +1,227 @@
+@if (isLoading()) {
+      <div class="page-container">
+        <div class="loading">Chargement de la méthodologie...</div>
+      </div>
+    }
+    @if (!isLoading()) {
+      <div class="page-container">
+        <header class="hero">
+          <div>
+            <h1>Méthodologie & À propos</h1>
+            <p>Documentation du projet, sources et pipeline 2019-2023.</p>
+          </div>
+          <div class="hero-tags">
+            <span>SAE S5</span>
+            <span>Analyse Qualité Air</span>
+            <span>{{ periodLabel() }}</span>
+          </div>
+        </header>
+
+        <nav class="tabs">
+          <button
+            class="tab"
+            type="button"
+            [class.active]="activeTab() === 'apropos'"
+            (click)="setActiveTab('apropos')"
+          >
+            À propos
+          </button>
+          <button
+            class="tab"
+            type="button"
+            [class.active]="activeTab() === 'methodologie'"
+            (click)="setActiveTab('methodologie')"
+          >
+            Méthodologie
+          </button>
+        </nav>
+
+        @if (activeTab() === 'apropos') {
+          <section class="summary-grid">
+            @for (item of summaryCards(); track item.label) {
+              <div class="summary-card">
+                <div class="summary-value">{{ item.value }}</div>
+                <div class="summary-label">{{ item.label }}</div>
+                @if (item.detail) {
+                  <div class="summary-detail">{{ item.detail }}</div>
+                }
+              </div>
+            }
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <h2>Qui nous sommes</h2>
+                <p>Équipe académique et objectifs du projet.</p>
+              </div>
+              <a class="panel-link" routerLink="/contact">Nous contacter</a>
+            </div>
+            <div class="identity-grid">
+              <div>
+                <span class="label">Équipe</span>
+                <span>5 étudiants</span>
+              </div>
+              <div>
+                <span class="label">Formation</span>
+                <span>3e année de BUT Informatique</span>
+              </div>
+              <div>
+                <span class="label">Parcours</span>
+                <span>Parcours C (AGED - Administration, gestion et exploitation des données)</span>
+              </div>
+              <div>
+                <span class="label">Etablissement</span>
+                <span>IUT de Montreuil</span>
+              </div>
+              <div>
+                <span class="label">Année académique</span>
+                <span>2024-2025</span>
+              </div>
+            </div>
+            <div class="identity-text">
+              <p>
+                Ce projet analyse comment les caracteristiques urbaines et sociales influencent
+                la qualité de l'air dans 101 villes sur la période 2019-2023.
+              </p>
+              <p>
+                Notre objectif est de produire une analyse claire, interactive et pédagogique,
+                en combinant données de pollution, indicateurs urbains et variables socio-économiques.
+              </p>
+            </div>
+          </section>
+        }
+
+        @if (activeTab() === 'methodologie') {
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <h2>Sources de données</h2>
+                <p>Jeux de données publics utilisés pour l'étude.</p>
+              </div>
+            </div>
+            <div class="source-grid">
+              <div class="source-card">
+                <h3>OpenAQ</h3>
+                <p>Données de pollution atmosphérique journalière.</p>
+                <ul>
+                  <li>6 polluants majeurs</li>
+                  <li>Mesures 2019-2023</li>
+                  <li>Couverture mondiale</li>
+                </ul>
+              </div>
+              <div class="source-card">
+                <h3>World Cities</h3>
+                <p>Géographie et démographie des villes.</p>
+                <ul>
+                  <li>Localisation et population</li>
+                  <li>Régions et pays</li>
+                  <li>Harmonisation des noms</li>
+                </ul>
+              </div>
+              <div class="source-card">
+                <h3>World Bank</h3>
+              <p>Indicateurs socio-économiques.</p>
+                <ul>
+                  <li>Urbanisation</li>
+                <li>Énergie et industrie</li>
+                <li>Développement social</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <h2>Pipeline de traitement</h2>
+                <p>Du nettoyage a la visualisation.</p>
+              </div>
+            </div>
+            <div class="pipeline-grid">
+              @for (step of pipelineSteps; track step.title) {
+                <div class="pipeline-card">
+                  <div class="pipeline-index">{{ step.index }}</div>
+                  <div>
+                    <h3>{{ step.title }}</h3>
+                    <p>{{ step.text }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+              <h2>Qualité des données</h2>
+                <p>Couverture des indicateurs clefs et volume disponible.</p>
+              </div>
+            </div>
+            <div class="quality-grid">
+              @for (item of qualityCards(); track item.label) {
+                <div class="quality-card">
+                  <div class="quality-value">{{ item.value }}</div>
+                  <div class="quality-label">{{ item.label }}</div>
+                  @if (item.detail) {
+                    <div class="quality-detail">{{ item.detail }}</div>
+                  }
+                </div>
+              }
+            </div>
+            <div class="coverage-list">
+              @for (item of coverage(); track item.label) {
+                <div class="coverage-row">
+                  <span>{{ item.label }}</span>
+                  <div class="coverage-bar">
+                    <div class="coverage-fill" [style.width.%]="item.value"></div>
+                  </div>
+                  <span class="mono">{{ item.value }}%</span>
+                </div>
+              }
+            </div>
+            <div class="quality-note">
+              Les valeurs manquantes sont imputees par la moyenne pour conserver le maximum de villes.
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <h2>Méthodes utilisées</h2>
+              <p>Statistiques descriptives, corrélations, ACP et modèles prédictifs.</p>
+              </div>
+            </div>
+            <div class="method-grid">
+              @for (method of methods; track method) {
+                <span class="method-chip">{{ method }}</span>
+              }
+            </div>
+            <div class="method-note">
+            Les analyses restent descriptives et s'appuient sur les données disponibles.
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <h2>Dictionnaire des variables</h2>
+                <p>Extrait synthetique du schema SQL (contexte/schema).</p>
+              </div>
+            </div>
+            <div class="dictionary-grid">
+              @for (group of dictionary; track group.title) {
+                <div class="dictionary-card">
+                  <h3>{{ group.title }}</h3>
+                  <ul>
+                    @for (item of group.items; track item.key) {
+                      <li><span class="mono">{{ item.key }}</span> - {{ item.label }}</li>
+                    }
+                  </ul>
+                </div>
+              }
+            </div>
+          </section>
+        }
+      </div>
+    }

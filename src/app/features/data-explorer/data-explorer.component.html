@@ -1,0 +1,192 @@
+@if (isLoading()) {
+      <app-loading-spinner
+        title="Chargement des données..."
+        message="Préparation de l'explorateur">
+      </app-loading-spinner>
+    }
+    @if (!isLoading()) {
+      <div class="page-container">
+        <header class="page-header">
+          <div>
+            <h1>Données brutes & export</h1>
+          <p>Explorer les datasets et exporter les résultats.</p>
+          </div>
+          <div class="mode-toggle">
+            <button type="button" [class.active]="datasetMode() === 'final'" (click)="setMode('final')">
+              Dataset final 2019-2023
+            </button>
+            <button type="button" [class.active]="datasetMode() === 'annual'" (click)="setMode('annual')">
+              Dataset annuel 2019-2023
+            </button>
+          </div>
+        </header>
+
+        <section class="toolbar-card">
+          <div class="toolbar-row">
+            <label class="field">
+              Recherche globale
+              <input type="text" [value]="searchTerm()" (input)="onSearchInput($event)" placeholder="Ville, pays, indicateur...">
+            </label>
+            <label class="field">
+              Filtrer colonne
+              <select [value]="filterColumnKey()" (change)="onFilterColumnChange($event)">
+                <option value="">Aucune</option>
+                @for (col of columns(); track col.key) {
+                  <option [value]="col.key">{{ col.label }}</option>
+                }
+              </select>
+            </label>
+            @if (filterColumnType() === 'number') {
+              <label class="field">
+                Min
+                <input type="number" [value]="filterMin()" (input)="onFilterMinInput($event)">
+              </label>
+              <label class="field">
+                Max
+                <input type="number" [value]="filterMax()" (input)="onFilterMaxInput($event)">
+              </label>
+            } @else if (filterColumnType() === 'string') {
+              <label class="field">
+                Contient
+                <input type="text" [value]="filterText()" (input)="onFilterTextInput($event)">
+              </label>
+            }
+            <label class="field">
+              Trier par
+              <select [value]="sortKey()" (change)="onSortKeyChange($event)">
+                <option value="">Aucun</option>
+                @for (col of columns(); track col.key) {
+                  <option [value]="col.key">{{ col.label }}</option>
+                }
+              </select>
+            </label>
+            <button class="ghost-btn" type="button" (click)="toggleSortDir()">
+              {{ sortDir() === 'asc' ? 'Asc' : 'Desc' }}
+            </button>
+          </div>
+          <div class="toolbar-row">
+            <div class="meta">
+              {{ filteredRows().length }} lignes ({{ selectedRowIds().length }} sélectionnées)
+            </div>
+            <div class="actions">
+              <button class="ghost-btn" type="button" (click)="selectAllColumns()">Tout</button>
+              <button class="ghost-btn" type="button" (click)="clearColumns()">Aucune</button>
+            </div>
+          </div>
+          <div class="columns-grid">
+            @for (col of columns(); track col.key) {
+              <label class="chip">
+                <input type="checkbox" [checked]="selectedColumns().includes(col.key)" (change)="toggleColumn(col.key)">
+                <span>{{ col.label }}</span>
+              </label>
+            }
+          </div>
+        </section>
+
+        <section class="table-card">
+          <div class="table-header">
+            <div>
+              <h2>Table interactive</h2>
+              <p>{{ filteredRows().length }} lignes</p>
+            </div>
+            <div class="table-actions">
+              <label class="field">
+                Par page
+                <select [value]="pageSize()" (change)="onPageSizeChange($event)">
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                  <option value="0">Tout</option>
+                </select>
+              </label>
+              <div class="pager">
+                <button class="ghost-btn" type="button" (click)="prevPage()" [disabled]="pageIndex() === 0">Prev</button>
+                <span>{{ pageIndex() + 1 }} / {{ pageCount() }}</span>
+                <button class="ghost-btn" type="button" (click)="nextPage()" [disabled]="pageIndex() >= pageCount() - 1">Next</button>
+              </div>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>
+                    <input type="checkbox" [checked]="pageAllSelected()" (change)="onToggleSelectPage($event)">
+                  </th>
+                  @for (col of visibleColumns(); track col.key) {
+                    <th>{{ col.label }}</th>
+                  }
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of pagedRows(); track row.__id) {
+                  <tr>
+                    <td>
+                      <input type="checkbox" [checked]="isSelected(row.__id)" (change)="toggleRow(row.__id)">
+                    </td>
+                    @for (col of visibleColumns(); track col.key) {
+                      <td>{{ formatCell(row[col.key]) }}</td>
+                    }
+                  </tr>
+                }
+              </tbody>
+            </table>
+            @if (pagedRows().length === 0) {
+              <div class="empty">Aucun resultat pour ces filtrés.</div>
+            }
+          </div>
+        </section>
+
+        <section class="stats-card" id="data-export-report">
+          <div class="stats-header">
+            <div>
+              <h2>Statistiques descriptives</h2>
+              <p>Colonne sélectionnée</p>
+            </div>
+            <label class="field">
+              Colonne
+              <select [value]="selectedColumnKey()" (change)="onSelectedColumnChange($event)">
+                @for (col of numericColumns(); track col.key) {
+                  <option [value]="col.key">{{ col.label }}</option>
+                }
+              </select>
+            </label>
+          </div>
+          @if (stats()) {
+            <div class="stats-grid">
+              <div>Nombre valeurs: {{ stats()!.count }}</div>
+              <div>Moyenne: {{ stats()!.mean | number:'1.1-1' }}</div>
+              <div>Mediane: {{ stats()!.median | number:'1.1-1' }}</div>
+              <div>Écart-type: {{ stats()!.std | number:'1.1-1' }}</div>
+              <div>Min: {{ stats()!.min | number:'1.1-1' }}</div>
+              <div>Max: {{ stats()!.max | number:'1.1-1' }}</div>
+              <div>Q1: {{ stats()!.q1 | number:'1.1-1' }}</div>
+              <div>Q3: {{ stats()!.q3 | number:'1.1-1' }}</div>
+            </div>
+            <div class="chart-canvas">
+              <canvas
+                #histogramChart
+                baseChart
+                [type]="histogram.type"
+                [data]="histogram.data"
+                [options]="histogram.options">
+              </canvas>
+            </div>
+          } @else {
+            <div class="empty">Sélectionnez une colonne numerique avec des valeurs.</div>
+          }
+        </section>
+
+        <section class="export-card">
+          <h2>Exports</h2>
+          <div class="export-grid">
+            <button class="primary-btn" type="button" (click)="exportCsv('full')">CSV complet (dataset courant)</button>
+            <button class="primary-btn" type="button" (click)="exportCsv('all')">CSV complet (final + annuel)</button>
+            <button class="ghost-btn" type="button" (click)="exportCsv('filtered')">CSV filtre</button>
+            <button class="ghost-btn" type="button" [disabled]="selectedRowIds().length === 0" (click)="exportCsv('selected')">CSV sélection</button>
+            <button class="ghost-btn" type="button" (click)="exportPdf()">Rapport PDF</button>
+            <button class="ghost-btn" type="button" (click)="exportPng()">Graphique PNG</button>
+          </div>
+        </section>
+      </div>
+    }

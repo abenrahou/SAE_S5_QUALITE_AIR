@@ -1,0 +1,98 @@
+<aside
+  [class]="isCollapsed()
+    ? 'sidebar fixed left-0 top-0 h-screen w-20 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 z-40'
+    : 'sidebar fixed left-0 top-0 h-screen w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 z-40'">
+
+  <!-- Logo & Title -->
+  <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+    <div class="flex items-center justify-between">
+      @if (!isCollapsed()) {
+        <div class="flex items-center space-x-3">
+          <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span class="font-bold text-lg text-gray-800 dark:text-gray-100">Qualité de l'Air</span>
+        </div>
+      } @else {
+        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      }
+    </div>
+  </div>
+
+  <!-- Navigation Menu -->
+  <nav class="flex-1 overflow-y-auto py-4">
+    <ul class="space-y-1 px-3">
+      @for (item of menuItems; track item.route) {
+        <li>
+          @if (!item.children) {
+            <a
+              [routerLink]="item.route"
+              routerLinkActive="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+              class="flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+              [title]="item.label">
+              <app-icon [name]="item.icon"></app-icon>
+              @if (!isCollapsed()) {
+                <span class="font-medium">{{ item.label }}</span>
+              }
+            </a>
+          } @else {
+            <div>
+              <button
+                class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+                [title]="item.label">
+                <app-icon [name]="item.icon"></app-icon>
+                @if (!isCollapsed()) {
+                  <span class="font-medium flex-1 text-left">{{ item.label }}</span>
+                  <span class="text-sm">v</span>
+                }
+              </button>
+
+              <!-- Sub-menu -->
+              @if (!isCollapsed()) {
+                <ul class="ml-8 mt-1 space-y-1">
+                  @for (child of item.children ?? []; track child.route) {
+                    <li>
+                      <a
+                        [routerLink]="child.route"
+                        routerLinkActive="text-blue-600 dark:text-blue-400 font-medium"
+                        class="flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 text-sm text-gray-600 dark:text-gray-400">
+                        <app-icon [name]="child.icon" iconClass="!w-4 !h-4"></app-icon>
+                        <span>{{ child.label }}</span>
+                      </a>
+                    </li>
+                  }
+                </ul>
+              }
+            </div>
+          }
+        </li>
+      }
+    </ul>
+  </nav>
+
+  <!-- Footer Actions -->
+  <div class="p-4 border-t border-gray-200 dark:border-gray-700">
+    <!-- Dark Mode Toggle -->
+    <button
+      (click)="toggleDarkMode()"
+      class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+      [title]="'Dark Mode'">
+      <app-icon [name]="themeService.isDarkMode() ? 'sun' : 'moon'" iconClass="!w-5 !h-5"></app-icon>
+      @if (!isCollapsed()) {
+        <span class="font-medium">
+          {{ themeService.isDarkMode() ? 'Mode clair' : 'Mode sombre' }}
+        </span>
+      }
+    </button>
+
+    <!-- Collapse Toggle -->
+    <button
+      (click)="toggleSidebar()"
+      class="w-full mt-2 flex items-center justify-center px-3 py-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400"
+      title="Réduire la sidebar">
+      <span class="text-xl">{{ isCollapsed() ? '<' : '>' }}</span>
+    </button>
+  </div>
+</aside>

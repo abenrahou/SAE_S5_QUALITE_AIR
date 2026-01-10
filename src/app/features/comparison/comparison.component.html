@@ -1,0 +1,216 @@
+@if (isLoading()) {
+      <app-loading-spinner
+        title="Chargement de la comparaison..."
+        message="Préparation des données de villes">
+      </app-loading-spinner>
+    }
+
+    @if (!isLoading()) {
+      <div class="page-container max-w-6xl mx-auto">
+        <div class="page-header">
+          <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">Comparateur de villes</h1>
+          <p class="text-gray-600 dark:text-gray-400">
+            Comparez 2 a 4 villes sur la pollution, l'énergie, le développement et l'urbanisation.
+          </p>
+        </div>
+
+        <section class="selector-card">
+          <div class="selector-row">
+            <div class="selector-input">
+              <label for="city-input">Ajouter une ville</label>
+              <input
+                id="city-input"
+                list="city-list"
+                placeholder="Paris, Delhi..."
+                #cityInput>
+              <datalist id="city-list">
+                @for (name of cityNames(); track name) {
+                  <option [value]="name"></option>
+                }
+              </datalist>
+            </div>
+            <button class="primary-btn" type="button" (click)="addCity(cityInput.value)">
+              Ajouter
+            </button>
+            <button class="ghost-btn" type="button" (click)="resetSelection()">
+              Réinitialiser
+            </button>
+          </div>
+          <div class="selected-row">
+            @for (city of selectedCities(); track city.cityName) {
+              <span class="chip">
+                {{ city.cityName }}
+                <button type="button" (click)="removeCity(city.cityName)">x</button>
+              </span>
+            }
+            @if (selectedCities().length === 0) {
+              <span class="empty">Aucune ville sélectionnée</span>
+            }
+          </div>
+          <div class="selector-footer">
+            <span>Sélection: {{ selectedCities().length }} / 4</span>
+            <button class="primary-btn" type="button" [disabled]="selectedCities().length < 2" (click)="buildCharts()">
+              Comparer
+            </button>
+          </div>
+        </section>
+
+        <section class="identity-grid">
+          @for (city of selectedCities(); track city.cityName) {
+            <div class="identity-card">
+              <div class="identity-title">
+                <h3>{{ city.cityName }}</h3>
+                <span>{{ city.countryName }}</span>
+              </div>
+              <div class="identity-stats">
+                <div><strong>Population:</strong> {{ formatNumber(city.population) }}</div>
+                <div><strong>Densité:</strong> {{ formatNumber(city.density) }} hab/km2</div>
+                <div><strong>Région:</strong> {{ city.region || 'n/a' }}</div>
+                <div><strong>PIB/hab:</strong> {{ formatNumber(indicatorMap().get(city.cityName)?.gdpPerCapita) }} USD</div>
+              </div>
+            </div>
+          }
+        </section>
+
+        <section class="highlight-card">
+          <h3>Points cles</h3>
+          <div class="highlight-row">
+            <div>
+              <strong>Plus pollue:</strong>
+              {{ extremes().maxCity || 'n/a' }} ({{ extremes().maxValue }} {{ pollutantInfo().unit }})
+            </div>
+            <div>
+              <strong>Moins pollue:</strong>
+              {{ extremes().minCity || 'n/a' }} ({{ extremes().minValue }} {{ pollutantInfo().unit }})
+            </div>
+          </div>
+        </section>
+
+        <div class="chart-grid">
+          <section class="chart-section radar">
+            <div class="section-header">
+              <div>
+                <h2>Radar pollution</h2>
+                <p>Comparaison normalisee des 6 polluants</p>
+              </div>
+            </div>
+            <div class="chart-canvas">
+              <canvas
+                baseChart
+                [type]="radarChart.type"
+                [data]="radarChart.data"
+                [options]="radarChart.options">
+              </canvas>
+            </div>
+          </section>
+
+          <section class="chart-section">
+            <div class="section-header">
+              <div>
+                <h2>Indicateurs Énergie</h2>
+                <p>Parcourez les métriques</p>
+              </div>
+              <div class="carousel-controls">
+                <button type="button" (click)="scrollCarousel(energyCarousel, -1)">&lt;</button>
+                <div class="carousel-dots">
+                  <button type="button" class="dot" [class.active]="activeEnergyDot() === 0" (click)="scrollToIndex(energyCarousel, 0)">1</button>
+                  <button type="button" class="dot" [class.active]="activeEnergyDot() === 1" (click)="scrollToIndex(energyCarousel, 1)">2</button>
+                  <button type="button" class="dot" [class.active]="activeEnergyDot() === 2" (click)="scrollToIndex(energyCarousel, 2)">3</button>
+                </div>
+                <button type="button" (click)="scrollCarousel(energyCarousel, 1)">&gt;</button>
+              </div>
+            </div>
+            <div class="metric-carousel" #energyCarousel (scroll)="updateActiveDot(energyCarousel, 'energy')">
+              @for (chart of energyMetricCharts; track chart.title) {
+                <div class="metric-card">
+                  <h4>{{ chart.title }}</h4>
+                  <div class="chart-canvas">
+                    <canvas baseChart [type]="chart.type" [data]="chart.data" [options]="chart.options"></canvas>
+                  </div>
+                </div>
+              }
+            </div>
+          </section>
+
+          <section class="chart-section">
+            <div class="section-header">
+              <div>
+                <h2>Indicateurs Développement</h2>
+                <p>Comparaison directe par métrique</p>
+              </div>
+              <div class="carousel-controls">
+                <button type="button" (click)="scrollCarousel(devCarousel, -1)">&lt;</button>
+                <div class="carousel-dots">
+                  <button type="button" class="dot" [class.active]="activeDevDot() === 0" (click)="scrollToIndex(devCarousel, 0)">1</button>
+                  <button type="button" class="dot" [class.active]="activeDevDot() === 1" (click)="scrollToIndex(devCarousel, 1)">2</button>
+                  <button type="button" class="dot" [class.active]="activeDevDot() === 2" (click)="scrollToIndex(devCarousel, 2)">3</button>
+                </div>
+                <button type="button" (click)="scrollCarousel(devCarousel, 1)">&gt;</button>
+              </div>
+            </div>
+            <div class="metric-carousel" #devCarousel (scroll)="updateActiveDot(devCarousel, 'development')">
+              @for (chart of devMetricCharts; track chart.title) {
+                <div class="metric-card">
+                  <h4>{{ chart.title }}</h4>
+                  <div class="chart-canvas">
+                    <canvas baseChart [type]="chart.type" [data]="chart.data" [options]="chart.options"></canvas>
+                  </div>
+                </div>
+              }
+            </div>
+          </section>
+
+          <section class="chart-section">
+            <div class="section-header">
+              <div>
+                <h2>Indicateurs urbanisation</h2>
+                <p>Chaque indicateur garde sa propre echelle</p>
+              </div>
+              <div class="carousel-controls">
+                <button type="button" (click)="scrollCarousel(urbanCarousel, -1)">&lt;</button>
+                <div class="carousel-dots">
+                  <button type="button" class="dot" [class.active]="activeUrbanDot() === 0" (click)="scrollToIndex(urbanCarousel, 0)">1</button>
+                  <button type="button" class="dot" [class.active]="activeUrbanDot() === 1" (click)="scrollToIndex(urbanCarousel, 1)">2</button>
+                  <button type="button" class="dot" [class.active]="activeUrbanDot() === 2" (click)="scrollToIndex(urbanCarousel, 2)">3</button>
+                </div>
+                <button type="button" (click)="scrollCarousel(urbanCarousel, 1)">&gt;</button>
+              </div>
+            </div>
+            <div class="metric-carousel" #urbanCarousel (scroll)="updateActiveDot(urbanCarousel, 'urban')">
+              @for (chart of urbanMetricCharts; track chart.title) {
+                <div class="metric-card">
+                  <h4>{{ chart.title }}</h4>
+                  <div class="chart-canvas">
+                    <canvas baseChart [type]="chart.type" [data]="chart.data" [options]="chart.options"></canvas>
+                  </div>
+                </div>
+              }
+            </div>
+          </section>
+
+          <section class="chart-section wide time">
+            <div class="section-header">
+              <div>
+                <h2>Évolution temporelle</h2>
+                <p>2019-2023 par ville</p>
+              </div>
+              <div class="pollutant-inline">
+                <label for="pollutant-time">Polluant</label>
+                <select
+                  id="pollutant-time"
+                  [value]="timePollutant()"
+                  (change)="onTimePollutantChange($event)">
+                  @for (option of timePollutantOptions(); track option.value) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+            <div class="chart-canvas">
+              <canvas baseChart [type]="timeChart.type" [data]="timeChart.data" [options]="timeChart.options"></canvas>
+            </div>
+          </section>
+        </div>
+
+      </div>
+    }

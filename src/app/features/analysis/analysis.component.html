@@ -1,0 +1,113 @@
+@if (isLoading()) {
+      <app-loading-spinner
+        title="Chargement des analyses..."
+        message="Préparation des résultats">
+      </app-loading-spinner>
+    }
+
+    @if (!isLoading()) {
+      <div class="page-container max-w-6xl mx-auto">
+        <div class="page-header mb-8">
+          <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+            Analyses par axe
+          </h1>
+          <p class="text-gray-600 dark:text-gray-400">
+            Exploration des cinq axes principaux avec indicateurs, graphiques et interprétation.
+          </p>
+        </div>
+
+        <div class="tabs">
+          <div class="pollutant-select">
+            <label for="pollutant">Polluant</label>
+            <select
+              id="pollutant"
+              [value]="selectedPollutant()"
+              (change)="onPollutantChange($event)">
+              @for (option of pollutantOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }} ({{ option.unit }})</option>
+              }
+            </select>
+          </div>
+          @for (tab of tabs(); track tab.id) {
+            <button
+              class="tab-button"
+              [class.tab-active]="tab.id === selectedAxis()"
+              (click)="selectAxis(tab.id)">
+              <app-icon [name]="tab.icon" iconClass="!w-5 !h-5"></app-icon>
+              <span>{{ tab.label }}</span>
+            </button>
+          }
+        </div>
+
+        @if (activeTab()) {
+          <section class="axis-header">
+            <div class="axis-title">
+              <div class="axis-icon" [style.background]="activeTab()!.accent">
+                <app-icon [name]="activeTab()!.icon" iconClass="!w-6 !h-6 text-white"></app-icon>
+              </div>
+              <div>
+                <h2 class="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+                  {{ activeTab()!.label }}
+                </h2>
+                <p class="text-sm text-slate-500 dark:text-slate-400">
+                  Question: {{ activeTab()!.question }}
+                </p>
+              </div>
+            </div>
+            <div class="axis-hypothesis">
+              <span class="hypothesis-label">Hypothèse</span>
+              <p>{{ activeTab()!.hypothesis }}</p>
+            </div>
+            <div class="axis-pollutant">
+              Analyse pour: <strong>{{ pollutantInfo().name }}</strong> ({{ pollutantInfo().unit }})
+            </div>
+          </section>
+
+          <div class="kpi-grid">
+            @for (kpi of activeTab()!.kpis; track kpi.label) {
+              <app-kpi-card
+                [icon]="kpi.icon"
+                [value]="kpi.value"
+                [label]="kpi.label"
+                [subtext]="kpi.subtext"
+                [color]="kpi.color"
+                [animate]="false">
+              </app-kpi-card>
+            }
+          </div>
+
+          <div class="chart-grid">
+            @for (chart of activeTab()!.charts; track chart.title) {
+              <div class="chart-card">
+                <div>
+                  <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">{{ chart.title }}</h3>
+                  <p class="text-sm text-slate-500 dark:text-slate-400">{{ chart.description }}</p>
+                </div>
+                <canvas
+                  baseChart
+                  [type]="chart.type"
+                  [data]="chart.data"
+                  [options]="chart.options">
+                </canvas>
+                <p class="chart-footer">{{ chart.footer }}</p>
+              </div>
+            }
+          </div>
+
+          <div class="insight-grid">
+            <div class="insight-card">
+              <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Points cles</h3>
+              <ul>
+                @for (item of activeTab()!.insights; track item) {
+                  <li>{{ item }}</li>
+                }
+              </ul>
+            </div>
+            <div class="insight-card emphasis">
+              <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Interprétation</h3>
+              <p>{{ activeTab()!.interpretation }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    }

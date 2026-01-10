@@ -1,0 +1,411 @@
+.page-container {
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .map-shell {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .filter-panel {
+      position: sticky;
+      top: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    .panel-header {
+      margin-bottom: 20px;
+    }
+
+    .panel-section {
+      margin-bottom: 16px;
+    }
+
+    .panel-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #0f172a;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+
+    .panel-select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid #cbd5f5;
+      background: white;
+      font-size: 14px;
+    }
+
+    .panel-help {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .panel-toggle {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .toggle-option {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      color: #1e293b;
+    }
+
+    .panel-range {
+      width: 100%;
+    }
+
+    .range-values {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #475569;
+      margin-top: 6px;
+    }
+
+    .panel-reset {
+      width: 100%;
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: none;
+      background: #0f172a;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .panel-stats {
+      margin-top: 20px;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 16px;
+      display: grid;
+      gap: 10px;
+      font-size: 14px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      color: #334155;
+    }
+
+    .map-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .map-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: white;
+      padding: 16px 20px;
+      border-radius: 16px;
+    }
+
+    .toolbar-title {
+      font-size: 18px;
+      font-weight: 600;
+      display: block;
+    }
+
+    .toolbar-sub {
+      font-size: 12px;
+      color: #cbd5f5;
+    }
+
+    .legend-toggle {
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: transparent;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .map-wrapper {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      background: #0f172a;
+      min-height: 520px;
+    }
+
+    .map-canvas {
+      width: 100%;
+      height: 70vh;
+      min-height: 520px;
+    }
+
+    :host ::ng-deep .map-legend {
+      background: rgba(255, 255, 255, 0.96);
+      color: #0f172a;
+      padding: 12px 14px;
+      border-radius: 14px;
+      display: grid;
+      gap: 8px;
+      font-size: 12px;
+      border: 1px solid rgba(15, 23, 42, 0.15);
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.18);
+      min-width: 140px;
+    }
+
+    :host ::ng-deep .map-legend .legend-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    :host ::ng-deep .map-legend .legend-subtitle {
+      font-size: 11px;
+      color: #475569;
+      margin-bottom: 6px;
+    }
+
+    :host ::ng-deep .map-legend .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    :host ::ng-deep .map-legend .legend-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      display: inline-block;
+      border: 2px solid #0f172a;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.25);
+    }
+
+    :host ::ng-deep .map-legend .legend-good { background: #22c55e; }
+    :host ::ng-deep .map-legend .legend-moderate { background: #facc15; }
+    :host ::ng-deep .map-legend .legend-bad { background: #fb923c; }
+    :host ::ng-deep .map-legend .legend-very-bad { background: #ef4444; }
+
+    :host-context(.dark) ::ng-deep .map-legend {
+      background: rgba(15, 23, 42, 0.95);
+      color: #e2e8f0;
+      border-color: rgba(148, 163, 184, 0.35);
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.5);
+    }
+
+    :host-context(.dark) ::ng-deep .map-legend .legend-subtitle {
+      color: #cbd5f5;
+    }
+
+    :host-context(.dark) ::ng-deep .map-legend .legend-dot {
+      border-color: #e2e8f0;
+    }
+
+    .marker-dot {
+      border-radius: 999px;
+      border: 2px solid white;
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.4);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      z-index: 1000;
+    }
+
+    .modal-card {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(720px, 90vw);
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      z-index: 1010;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 30px 60px rgba(15, 23, 42, 0.3);
+      display: grid;
+      gap: 16px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 12px;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 22px;
+      color: #0f172a;
+    }
+
+    .modal-header p {
+      margin: 4px 0 0;
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    .modal-close {
+      border: none;
+      background: #0f172a;
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .modal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .modal-section {
+      background: #f8fafc;
+      border-radius: 16px;
+      padding: 14px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .modal-section h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      color: #0f172a;
+    }
+
+    .modal-row {
+      font-size: 13px;
+      color: #475569;
+      margin-bottom: 6px;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .primary-btn {
+      background: #0f172a;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    :host-context(.dark) .modal-card {
+      background: #0f172a;
+      border-color: rgba(148, 163, 184, 0.2);
+    }
+
+    :host-context(.dark) .modal-header h2,
+    :host-context(.dark) .modal-section h3 {
+      color: #e2e8f0;
+    }
+
+    :host-context(.dark) .modal-header p,
+    :host-context(.dark) .modal-row {
+      color: #cbd5f5;
+    }
+
+    :host-context(.dark) .modal-section {
+      background: #0b1120;
+      border-color: rgba(148, 163, 184, 0.2);
+    }
+
+    :host-context(.dark) .modal-close,
+    :host-context(.dark) .primary-btn {
+      background: #38bdf8;
+      color: #0f172a;
+    }
+
+    :host-context(.dark) .filter-panel {
+      background: #0f172a;
+      border-color: rgba(148, 163, 184, 0.2);
+      box-shadow: 0 16px 32px rgba(15, 23, 42, 0.4);
+    }
+
+    :host-context(.dark) .panel-label {
+      color: #e2e8f0;
+    }
+
+    :host-context(.dark) .panel-select {
+      background: #111827;
+      border-color: rgba(148, 163, 184, 0.3);
+      color: #e2e8f0;
+    }
+
+    :host-context(.dark) .panel-help {
+      color: #94a3b8;
+    }
+
+    :host-context(.dark) .toggle-option {
+      color: #cbd5f5;
+    }
+
+    :host-context(.dark) .range-values {
+      color: #cbd5f5;
+    }
+
+    :host-context(.dark) .panel-reset {
+      background: #38bdf8;
+      color: #0f172a;
+    }
+
+    :host-context(.dark) .panel-stats {
+      border-top-color: rgba(148, 163, 184, 0.2);
+    }
+
+    :host-context(.dark) .stat-row {
+      color: #e2e8f0;
+    }
+
+    :host-context(.dark) .map-toolbar {
+      background: linear-gradient(135deg, #0b1120 0%, #1f2937 100%);
+    }
+
+    :host-context(.dark) .map-wrapper {
+      border-color: rgba(148, 163, 184, 0.2);
+      background: #0b1120;
+    }
+
+    @media (max-width: 1024px) {
+      .map-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .filter-panel {
+        position: static;
+      }
+
+      .map-canvas {
+        height: 60vh;
+      }
+    }

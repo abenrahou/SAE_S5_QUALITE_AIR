@@ -1,0 +1,285 @@
+@if (isLoading()) {
+      <app-loading-spinner
+        title="Chargement de l'analyse multivariee..."
+        message="Préparation des axes PCA">
+      </app-loading-spinner>
+    }
+    @if (!isLoading()) {
+      <div class="page-container">
+        <header class="page-header">
+          <div>
+            <h1>Analyse multivariee (ACP)</h1>
+            <p>Réduction dimensionnelle pour comprendre les profils de villes.</p>
+          </div>
+          <button class="info-btn" type="button" (click)="openInfo()">i</button>
+        </header>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>Variance expliquee</h2>
+              <p>Contribution des composantes principales</p>
+            </div>
+            <span class="panel-tag">Diagramme des eboulis</span>
+          </div>
+          <div class="chart-canvas tall">
+            <canvas
+              baseChart
+              [type]="varianceChart.type"
+              [data]="varianceChart.data"
+              [options]="varianceChart.options">
+            </canvas>
+          </div>
+          <div class="variance-summary">
+            <div>PC1: {{ varianceExplained()[0] | number:'1.0-1' }}%</div>
+            <div>PC2: {{ varianceExplained()[1] | number:'1.0-1' }}%</div>
+            <div>PC3: {{ varianceExplained()[2] | number:'1.0-1' }}%</div>
+            <div>Total 3 PCs: {{ totalVariance() | number:'1.0-1' }}%</div>
+          </div>
+          <div class="limit-card">
+            <div class="limit-title">Limites et lecture</div>
+            <div class="limit-list">
+              <div>ACP calculee sur {{ activeCityCount() }} villes et {{ activeFeatureCount() }} variables actives.</div>
+              <div>Les axes sont des combinaisons lineaires: l'ACP capte des tendances globales, pas des causalites.</div>
+              <div>Les valeurs manquantes sont imputees par la moyenne, ce qui peut lisser des variations locales.</div>
+              <div>Les résultats dépendent du choix des variables et de la standardisation.</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>Loadings (variables les plus contributives)</h2>
+              <p>Top contributions sur PC1, PC2 et PC3</p>
+            </div>
+          </div>
+          <div class="loadings-grid">
+            @for (pc of loadings(); track pc.pc) {
+              <div class="loadings-card">
+                <div class="loadings-title">{{ pc.pc }}</div>
+                <div class="loadings-list">
+                  @for (item of getTopLoadingsFor(pc); track item.label) {
+                    <div class="loadings-row">
+                      <span>{{ item.label }}</span>
+                      <span class="mono">{{ item.value | number:'1.2-2' }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>Filtrés ACP</h2>
+              <p>Sélectionnez les variables utilisées pour l'ACP</p>
+            </div>
+          </div>
+          <div class="feature-grid">
+            @for (feature of features; track feature.key) {
+              <label class="feature-chip">
+                <input
+                  type="checkbox"
+                  [checked]="selectedFeatureKeys().includes(feature.key)"
+                  (change)="toggleFeature(feature.key)">
+                <span>{{ feature.label }}</span>
+              </label>
+            }
+          </div>
+          @if (featureWarning()) {
+            <div class="feature-warning">{{ featureWarning() }}</div>
+          }
+          @if (activeFeatureCount()) {
+            <div class="feature-meta">
+              Variables actives: {{ activeFeatureCount() }}
+            </div>
+          }
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>Plan factoriel (PC1 - PC2)</h2>
+              <p>Chaque point represente une ville</p>
+            </div>
+            <label class="select-label">
+              Couleur:
+              <select [value]="colorMode()" (change)="onColorModeChange($event)">
+                <option value="region">Region</option>
+                <option value="development">Niveau développement</option>
+                <option value="urbanization">Niveau urbanisation</option>
+                <option value="pm25">PM2.5</option>
+              </select>
+            </label>
+          </div>
+          <div class="chart-canvas">
+            <canvas
+              baseChart
+              [type]="scatterChart.type"
+              [data]="scatterChart.data"
+              [options]="scatterChart.options">
+            </canvas>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>Projection 3D (PC1 - PC2 - PC3)</h2>
+              <p>Nuage de points interactif en 3 dimensions</p>
+            </div>
+            <div class="panel-actions">
+              <button class="ghost-btn" type="button" (click)="render3DPlot()">Reset camera</button>
+              <button class="info-btn" type="button" (click)="openInfo3d()">i</button>
+            </div>
+          </div>
+          <div class="plotly-canvas" #pca3d></div>
+        </section>
+      </div>
+    }
+
+    @if (infoOpen()) {
+      <div class="modal-backdrop" (click)="closeInfo()"></div>
+      <div class="modal">
+        <div class="modal-header">
+          <div>
+            <h3>Comprendre l'ACP</h3>
+            <p>Analyse en composantes principales</p>
+          </div>
+          <button type="button" class="ghost-btn" (click)="closeInfo()">Fermer</button>
+        </div>
+        <div class="modal-body">
+          <div class="info-block">
+            <h4>Pourquoi l'ACP ?</h4>
+            <p>
+              L'ACP (Analyse en Composantes Principales) sert a reduire la dimension.
+              On remplace p variables par de nouvelles variables C1, C2, ... qui
+              résument au mieux la variabilit? des données.
+            </p>
+          </div>
+          <div class="info-grid">
+            <div class="info-card">
+              <div class="formula">Z = (X - moyenne) / écart-type</div>
+              <p class="formula-note">
+                On centre et reduit les variables pour les mettre sur la meme echelle.
+              </p>
+            </div>
+            <div class="info-card">
+              <div class="formula">Vx = (1/n) * Z^T * Z</div>
+              <p class="formula-note">
+                Vx est la matrice de variance-covariance (symétrique, définie positive).
+              </p>
+            </div>
+            <div class="info-card">
+              <div class="formula">Vx = P D P^T</div>
+              <p class="formula-note">
+                P contient les vecteurs propres orthonormes, D les valeurs propres (lambda).
+              </p>
+            </div>
+            <div class="info-card">
+              <div class="formula">C = Z * P</div>
+              <p class="formula-note">
+                P contient les vecteurs propres u1, u2, ... de Vx. Les composantes sont Cj = Z * uj.
+              </p>
+            </div>
+          </div>
+          <div class="info-block">
+            <h4>Ce que disent les valeurs propres</h4>
+            <p>
+              Vx = P D P^T, avec D = diag(lambda1, lambda2, ...). La variance de Cj vaut lambda_j
+              et les composantes sont non correlees (Cov(Ci, Cj) = 0).
+            </p>
+            <p>
+              L'inertie globale est Ig = somme(lambda). La part expliquee par l'axe j est
+              lambda_j / Ig. On garde les axes qui expliquent la majorite de l'inertie.
+            </p>
+          </div>
+          <div class="info-block">
+            <h4>Gestion des données manquantes</h4>
+            <p>
+              Les valeurs manquantes sont remplacees par la moyenne de la variable (imputation)
+              afin de conserver un maximum de villes.
+            </p>
+            <p>
+              Les variables trop manquantes ou sans variance sont retirees automatiquement.
+              Un avertissement apparait si l'ACP ne peut pas être calculee correctement.
+            </p>
+            <p>
+              Le panneau "Filtrés ACP" affiche le nombre de variables actives prises en compte.
+            </p>
+          </div>
+          <div class="info-block">
+            <h4>Que signifie PC1, PC2, PC3 ?</h4>
+            <p>
+              Chaque PC est une combinaison lineaire des variables. Les "loadings" (coefficients)
+              indiquent quelles variables poussent l'axe. Un coefficient positif signifie que
+              l'axe augmente quand la variable augmente; un coefficient negatif signifie l'inverse.
+            </p>
+            <div class="pc-toggle">
+              <button class="ghost-btn" type="button" (click)="toggleFullLoadings()">
+                {{ showFullLoadings() ? 'Voir moins' : 'Voir plus' }}
+              </button>
+              <span class="pc-toggle-note">Affiche {{ showFullLoadings() ? 'toutes' : 'les 6 plus fortes' }} contributions</span>
+            </div>
+            <div class="pc-examples">
+              @for (pc of loadings(); track pc.pc) {
+                <div class="pc-card">
+                  <div class="pc-title">{{ pc.pc }} (top loadings)</div>
+                  @for (item of getLoadingsFor(pc); track item.label) {
+                    <div class="pc-row">
+                      <span>{{ item.label }}</span>
+                      <span class="mono">{{ formatLoading(item.value) }}</span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+          <div class="info-hint">
+            Les barres indiquent la part d'inertie expliquee par chaque composante.
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (info3dOpen()) {
+      <div class="modal-backdrop" (click)="closeInfo3d()"></div>
+      <div class="modal">
+        <div class="modal-header">
+          <div>
+            <h3>Lecture de la projection 3D</h3>
+            <p>PC1, PC2 et PC3</p>
+          </div>
+          <button type="button" class="ghost-btn" (click)="closeInfo3d()">Fermer</button>
+        </div>
+        <div class="modal-body">
+          <div class="info-block">
+            <h4>Ce que vous voyez</h4>
+            <p>
+              Chaque point est une ville placee selon ses scores sur les trois premieres composantes.
+              Des points proches signifient des profils similaires.
+            </p>
+          </div>
+          <div class="info-grid">
+            <div class="info-card">
+              <div class="formula">Score = Z * uj</div>
+              <p class="formula-note">
+                Les coordonnées sur PC1, PC2, PC3 sont des projections sur les vecteurs propres.
+              </p>
+            </div>
+            <div class="info-card">
+              <div class="formula">Part axe = lambda_j / Ig</div>
+              <p class="formula-note">
+                Plus la part est grande, plus l'axe est informatif.
+              </p>
+            </div>
+          </div>
+          <div class="info-hint">
+            Utilisez la souris pour tourner, zoomer et isoler des groupes.
+          </div>
+        </div>
+      </div>
+    }

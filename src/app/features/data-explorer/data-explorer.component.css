@@ -1,0 +1,317 @@
+.page-container {
+      padding: 32px;
+      display: grid;
+      gap: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .page-header h1 {
+      margin: 0;
+      font-size: 28px;
+      color: #0f172a;
+    }
+
+    .page-header p {
+      margin: 6px 0 0;
+      color: #64748b;
+    }
+
+    .mode-toggle {
+      display: inline-flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .mode-toggle button {
+      border: 1px solid #cbd5f5;
+      background: #f8fafc;
+      padding: 8px 14px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .mode-toggle button.active {
+      background: #0f172a;
+      color: white;
+      border-color: #0f172a;
+    }
+
+    .toolbar-card,
+    .table-card,
+    .stats-card,
+    .export-card {
+      background: white;
+      border-radius: 20px;
+      border: 1px solid #e2e8f0;
+      padding: 20px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .toolbar-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: end;
+      justify-content: space-between;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      font-size: 13px;
+      color: #475569;
+      min-width: 180px;
+    }
+
+    .field input,
+    .field select {
+      border-radius: 10px;
+      border: 1px solid #cbd5f5;
+      padding: 8px 10px;
+      background: white;
+    }
+
+    .meta {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .ghost-btn {
+      border: 1px solid #cbd5f5;
+      background: transparent;
+      padding: 8px 14px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .primary-btn {
+      background: #0f172a;
+      color: white;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .columns-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid #cbd5f5;
+      background: #f8fafc;
+      font-size: 12px;
+      color: #334155;
+    }
+
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .table-header h2 {
+      margin: 0;
+      font-size: 20px;
+      color: #0f172a;
+    }
+
+    .table-header p {
+      margin: 4px 0 0;
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    .table-actions {
+      display: inline-flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .pager {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .table-wrapper {
+      overflow: auto;
+      border-radius: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 860px;
+    }
+
+    th,
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+      font-size: 12px;
+      color: #334155;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #f8fafc;
+      z-index: 2;
+      font-weight: 700;
+    }
+
+    .empty {
+      padding: 16px;
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    .stats-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .stats-header h2 {
+      margin: 0;
+      font-size: 20px;
+      color: #0f172a;
+    }
+
+    .stats-header p {
+      margin: 4px 0 0;
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 8px;
+      font-size: 13px;
+      color: #475569;
+    }
+
+    .chart-canvas {
+      height: 240px;
+    }
+
+    .chart-canvas canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    .export-card h2 {
+      margin: 0;
+      font-size: 20px;
+      color: #0f172a;
+    }
+
+    .export-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+    }
+
+    :host-context(.dark) .page-header h1,
+    :host-context(.dark) .table-header h2,
+    :host-context(.dark) .stats-header h2,
+    :host-context(.dark) .export-card h2 {
+      color: #e2e8f0;
+    }
+
+    :host-context(.dark) .page-header p,
+    :host-context(.dark) .table-header p,
+    :host-context(.dark) .stats-header p,
+    :host-context(.dark) .field,
+    :host-context(.dark) .meta,
+    :host-context(.dark) .pager {
+      color: #cbd5f5;
+    }
+
+    :host-context(.dark) .toolbar-card,
+    :host-context(.dark) .table-card,
+    :host-context(.dark) .stats-card,
+    :host-context(.dark) .export-card {
+      background: #0f172a;
+      border-color: rgba(148, 163, 184, 0.2);
+    }
+
+    :host-context(.dark) .field input,
+    :host-context(.dark) .field select {
+      background: #0b1120;
+      border-color: rgba(148, 163, 184, 0.3);
+      color: #e2e8f0;
+    }
+
+    :host-context(.dark) .chip {
+      background: #0b1120;
+      border-color: rgba(148, 163, 184, 0.3);
+      color: #e2e8f0;
+    }
+
+    :host-context(.dark) th,
+    :host-context(.dark) td {
+      color: #e2e8f0;
+    }
+
+    :host-context(.dark) th {
+      background: #0b1120;
+    }
+
+    :host-context(.dark) .table-wrapper {
+      border-color: rgba(148, 163, 184, 0.3);
+    }
+
+    :host-context(.dark) .ghost-btn {
+      color: #e2e8f0;
+      border-color: rgba(148, 163, 184, 0.3);
+    }
+
+    :host-context(.dark) .mode-toggle button {
+      background: #0b1120;
+      color: #e2e8f0;
+      border-color: rgba(148, 163, 184, 0.3);
+    }
+
+    :host-context(.dark) .mode-toggle button.active {
+      background: #60a5fa;
+      border-color: #60a5fa;
+      color: #0f172a;
+    }

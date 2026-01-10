@@ -1,59 +1,52 @@
-# SaeS5QualiteAir
+# SAE S5 - Qualite de l'air (2019-2023)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.5.
+Projet academique (BUT Informatique) : analyse interactive de la qualite de l'air dans 101 villes mondiales sur 2019-2023, avec indicateurs urbains et socio-economiques.
 
-## Development server
+## Equipe
+- Equipe Abrahams (IUT de Montreuil)
+- 3e annee de BUT Informatique
+- Parcours C (AGED - Administration, gestion et exploitation des donnees)
 
-To start a local development server, run:
+## Prerequis
+Voir `REQUIREMENTS.md`.
 
+## Installation
 ```bash
-ng serve
+npm install
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Donnees CSV
+Placez les fichiers CSV dans `public/assets/data/` :
+- `DATASET_FINAL_5ANS_2019_2023_AVEC_COVID.csv`
+- `DATASET_ANNUEL_2019_2023_AVEC_COVID.csv`
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
+## Lancer en local
 ```bash
-ng generate component component-name
+npm start
+```
+Puis ouvrez `http://localhost:4200`.
+
+## Build production
+```bash
+npm run build
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Scripts utiles
+- `npm start` : serveur de developpement
+- `npm run build` : build production
+- `npm test` : tests (si configures)
 
+## Structure (resume)
+- `src/app/features/` : pages (dashboard, map, analysis, prediction, ACP, correlations, etc.)
+- `src/app/core/` : services et modeles
+- `public/assets/data/` : donnees CSV
+
+## Deploiement GitHub Pages
+Exemple (a adapter a votre configuration) :
 ```bash
-ng generate --help
+npm run build
+# Publier le dossier dist/ avec GitHub Pages
 ```
 
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Support
+Contact : `equipeabrahams@gmail.com`

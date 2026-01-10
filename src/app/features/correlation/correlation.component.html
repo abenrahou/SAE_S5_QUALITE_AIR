@@ -1,0 +1,259 @@
+@if (isLoading()) {
+      <app-loading-spinner
+        title="Chargement des correlations..."
+        message="Calcul des matrices">
+      </app-loading-spinner>
+    }
+    @if (!isLoading()) {
+      <div class="page-container">
+        <header class="page-header">
+          <div>
+            <h1>Matrice de correlations</h1>
+            <p>Explorer les liens entre polluants, indicateurs urbains et socio-economiques.</p>
+          </div>
+          <div class="header-actions">
+            <label class="sort-label">
+              Trier par correlation avec
+              <select [value]="sortPollutant()" (change)="onSortPollutantChange($event)">
+                <option value="none">Aucun</option>
+                @for (poll of pollutantSortOptions; track poll.value) {
+                  <option [value]="poll.value">{{ poll.label }}</option>
+                }
+              </select>
+            </label>
+            <button class="ghost-btn" type="button" (click)="toggleGrouping()">
+              Regrouper par categorie
+            </button>
+          </div>
+        </header>
+
+        <section class="filter-card">
+          <div class="filter-title">Filtrés variables</div>
+          <div class="filter-grid">
+            @for (category of categories; track category.key) {
+              <label class="filter-chip">
+                <input
+                  type="checkbox"
+                  [checked]="categorySelection()[category.key]"
+                  (change)="toggleCategory(category.key)">
+                <span>{{ category.label }}</span>
+              </label>
+            }
+          </div>
+          <div class="filter-meta">
+            {{ selectedVariables().length }} variables sélectionnées
+          </div>
+        </section>
+
+        <section class="heatmap-section">
+          <div class="heatmap-header">
+            <div>
+              <h2>Heatmap des correlations</h2>
+              <p>Cliquez sur une cellule pour afficher le scatter plot detaille.</p>
+            </div>
+            <button class="info-btn" type="button" (click)="openInfo()">i</button>
+            <div class="legend">
+              <span class="legend-label">-1</span>
+              <span class="legend-bar"></span>
+              <span class="legend-label">+1</span>
+            </div>
+          </div>
+          <div class="heatmap-wrapper">
+            <div class="heatmap" [style.--cols]="selectedVariables().length + 1">
+              <div class="corner"></div>
+              @for (col of selectedVariables(); track col.key) {
+                <div class="col-label">{{ col.label }}</div>
+              }
+              @for (row of selectedVariables(); track row.key) {
+                <div class="row-label">{{ row.label }}</div>
+                @for (col of selectedVariables(); track col.key) {
+                  @let cell = getCell(row, col);
+                  <button
+                    type="button"
+                    class="cell"
+                    [style.background]="colorFor(cell.r)"
+                    [attr.title]="cellTitle(cell)"
+                    (click)="openScatter(cell)">
+                    {{ formatCorrelation(cell.r) }}
+                  </button>
+                }
+              }
+            </div>
+          </div>
+        </section>
+
+        <section class="limit-card">
+          <div class="limit-title">Limites et lecture</div>
+          <div class="limit-list">
+            <div>Correlation de Pearson = lien lineaire, pas de causalite.</div>
+            <div>n varie selon les paires (valeurs manquantes); les liens faibles sont moins fiables.</div>
+            <div>Les outliers peuvent influencer r, surtout si n est petit.</div>
+            <div>p-value affichée en detail est une approximation pédagogique.</div>
+            <div>{{ selectedVariables().length }} variables actives sur {{ totalCityCount() }} villes.</div>
+          </div>
+        </section>
+
+        <section class="table-section">
+          <div class="table-header">
+            <div>
+              <h2>Top correlations</h2>
+              <p>Top 10 correlations en valeur absolue</p>
+            </div>
+            <button class="info-btn" type="button" (click)="openTopInfo()">i</button>
+          </div>
+          <div class="table">
+            <div class="table-row table-head">
+              <span>#</span>
+              <span>Variable 1</span>
+              <span>Variable 2</span>
+              <span>r</span>
+              <span>n</span>
+            </div>
+            @for (item of topCorrelations(); track item.key) {
+              <div class="table-row">
+                <span>{{ item.rank }}</span>
+                <span>{{ item.left }}</span>
+                <span>{{ item.right }}</span>
+                <span class="mono">{{ formatCorrelation(item.r) }}</span>
+                <span>{{ item.n }}</span>
+              </div>
+            }
+          </div>
+        </section>
+      </div>
+    }
+
+    @if (scatterState()) {
+      <div class="modal-backdrop" (click)="closeScatter()"></div>
+      <div class="modal">
+        <div class="modal-header">
+          <div>
+            <h3>Correlation detaillee</h3>
+            <p>{{ scatterState()!.x.label }} vs {{ scatterState()!.y.label }}</p>
+          </div>
+          <button type="button" class="ghost-btn" (click)="closeScatter()">Fermer</button>
+        </div>
+        <div class="modal-stats">
+          <div>r = {{ formatCorrelation(scatterState()!.r) }}</div>
+          <div>R2 = {{ scatterState()!.r2.toFixed(2) }}</div>
+          <div>p-value ~ {{ scatterState()!.pValue.toFixed(3) }}</div>
+          <div>n = {{ scatterState()!.points.length }}</div>
+        </div>
+        <div class="chart-canvas">
+          <canvas
+            baseChart
+            [type]="scatterChart.type"
+            [data]="scatterChart.data"
+            [options]="scatterChart.options">
+          </canvas>
+        </div>
+      </div>
+    }
+
+    @if (infoOpen()) {
+      <div class="modal-backdrop" (click)="closeInfo()"></div>
+      <div class="modal">
+        <div class="modal-header">
+          <div>
+            <h3>Comment lire la heatmap</h3>
+            <p>Correlation de Pearson</p>
+          </div>
+          <button type="button" class="ghost-btn" (click)="closeInfo()">Fermer</button>
+        </div>
+        <div class="modal-body">
+          <div class="info-block">
+            <h4>Ce que mesure la heatmap</h4>
+            <p>
+              Chaque case compare deux variables (ex: PM2.5 et densite). Le chiffre affiche leur
+              lien statistique, note r. Plus r est proche de +1, plus elles montent ensemble.
+              Plus r est proche de -1, plus l'une monte quand l'autre baisse. Autour de 0,
+              il n'y a pas de lien clair.
+            </p>
+          </div>
+          <div class="info-grid">
+            <div class="info-card">
+              <div class="mini-scale">
+                <span>-1</span>
+                <div class="scale-bar"></div>
+                <span>+1</span>
+              </div>
+              <div class="mini-labels">
+                <span>Negatif</span>
+                <span>Neutre</span>
+                <span>Positif</span>
+              </div>
+            </div>
+            <div class="info-card">
+              <div class="formula">r = cov(X, Y) / (sigmaX * sigmaY)</div>
+              <p class="formula-note">
+                cov = covariance, sigma = écart-type. Calcul fait uniquement sur les villes
+                qui ont les deux valeurs.
+              </p>
+            </div>
+          </div>
+          <div class="info-block">
+            <h4>Exemple simple</h4>
+            <p>
+              Si r = 0.70 entre "Electricite charbon" et "PM2.5", cela signifie que
+              les villes avec plus de charbon ont tendance a être plus polluees.
+            </p>
+          </div>
+          <div class="info-hint">
+            Cliquez sur une case pour voir le nuage de points correspondant.
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (topInfoOpen()) {
+      <div class="modal-backdrop" (click)="closeTopInfo()"></div>
+      <div class="modal">
+        <div class="modal-header">
+          <div>
+            <h3>Comment lire le Top correlations</h3>
+            <p>Classement des liens les plus forts</p>
+          </div>
+          <button type="button" class="ghost-btn" (click)="closeTopInfo()">Fermer</button>
+        </div>
+        <div class="modal-body">
+          <div class="info-block">
+            <h4>Ce que montre le classement</h4>
+            <p>
+              On affiche les 10 paires de variables avec la correlation la plus forte (en valeur absolue).
+              Cela met en avant les liens les plus marquants, qu'ils soient positifs ou negatifs.
+            </p>
+          </div>
+          <div class="info-grid">
+            <div class="info-card">
+              <div class="mini-scale">
+                <span>-1</span>
+                <div class="scale-bar"></div>
+                <span>+1</span>
+              </div>
+              <div class="mini-labels">
+                <span>Fort negatif</span>
+                <span>Neutre</span>
+                <span>Fort positif</span>
+              </div>
+            </div>
+            <div class="info-card">
+              <div class="formula">|r| le plus grand = en haut</div>
+              <p class="formula-note">
+                Les valeurs proches de 0 indiquent peu ou pas de relation.
+                Les valeurs proches de 1 montrent une relation forte.
+              </p>
+            </div>
+            <div class="info-card">
+              <div class="formula">n = nombre de villes</div>
+              <p class="formula-note">
+                n correspond au nombre de villes pour lesquelles les deux variables sont disponibles.
+                Plus n est grand, plus le resultat est robuste.
+              </p>
+            </div>
+          </div>
+          <div class="info-hint">
+            Cliquez sur la heatmap pour ouvrir un scatter plot detaille.
+          </div>
+        </div>
+      </div>
+    }

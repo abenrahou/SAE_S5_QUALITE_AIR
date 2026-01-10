@@ -1,0 +1,183 @@
+@if (isLoading()) {
+      <app-loading-spinner
+        title="Chargement de la carte..."
+        message="Préparation des données géographiques">
+      </app-loading-spinner>
+    }
+
+    @if (!isLoading()) {
+      <div class="page-container max-w-7xl mx-auto">
+        <div class="page-header mb-8">
+          <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+            Carte mondiale interactive
+          </h1>
+          <p class="text-gray-600 dark:text-gray-400">
+            Visualisation geographique des niveaux de pollution atmospherique
+          </p>
+        </div>
+
+        <div class="map-shell">
+          <aside class="filter-panel">
+            <div class="panel-header">
+              <h2 class="text-lg font-semibold text-slate-900">Filtrés</h2>
+              <p class="text-sm text-slate-500">Ajuster les paramètres de la carte</p>
+            </div>
+
+            <div class="panel-section">
+              <label class="panel-label" for="pollutant">Polluant</label>
+              <select
+                id="pollutant"
+                class="panel-select"
+                [value]="selectedPollutant()"
+                (change)="onPollutantSelect($event)">
+                @for (option of pollutantOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+              <p class="panel-help">
+                Unite: {{ pollutantInfo().unit }} - OMS: {{ pollutantInfo().whoGuideline }}
+              </p>
+            </div>
+
+            <div class="panel-section">
+              <label class="panel-label" for="year">Année</label>
+              <select
+                id="year"
+                class="panel-select"
+                [value]="selectedYear()"
+                [disabled]="!annualAvailable()"
+                (change)="onYearSelect($event)">
+                @for (option of yearOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+              @if (!annualAvailable()) {
+                <p class="panel-help">Données annuelles indisponibles</p>
+              }
+            </div>
+
+            <div class="panel-section">
+              <label class="panel-label" for="region">Région</label>
+              <select
+                id="region"
+                class="panel-select"
+                [value]="selectedRegion()"
+                (change)="onRegionSelect($event)">
+                @for (region of regions(); track region) {
+                  <option [value]="region">{{ region }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="panel-section">
+              <span class="panel-label">Affichage</span>
+              <div class="panel-toggle">
+                <label class="toggle-option">
+                  <input
+                    type="radio"
+                    name="displayType"
+                    [checked]="displayType() === 'markers'"
+                    (change)="onDisplayTypeChange('markers')">
+                  <span>Markers</span>
+                </label>
+                <label class="toggle-option">
+                  <input
+                    type="radio"
+                    name="displayType"
+                    [checked]="displayType() === 'heatmap'"
+                    (change)="onDisplayTypeChange('heatmap')">
+                  <span>Heatmap</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="panel-section">
+              <label class="panel-label" for="threshold">Seuil OMS</label>
+              <input
+                id="threshold"
+                type="range"
+                min="0"
+                max="100"
+                step="1"
+                class="panel-range"
+                [value]="threshold()"
+                (input)="onThresholdInput($event)">
+              <div class="range-values">
+                <span>{{ threshold() }}</span>
+                <span>Recommande: {{ pollutantInfo().whoGuideline }}</span>
+              </div>
+            </div>
+
+            <button class="panel-reset" type="button" (click)="resetFilters()">
+              Réinitialiser filtrés
+            </button>
+
+            <div class="panel-stats">
+              <div class="stat-row">
+                <span>Villes affichees</span>
+                <strong>{{ displayedCount() }} / {{ totalCities() }}</strong>
+              </div>
+              <div class="stat-row">
+                <span>Pollution moyenne</span>
+                <strong>{{ avgPollution() }} {{ pollutantInfo().unit }}</strong>
+              </div>
+              <div class="stat-row">
+                <span>Au-dessus seuil OMS</span>
+                <strong>{{ aboveThresholdCount() }} ({{ aboveThresholdPct() }}%)</strong>
+              </div>
+            </div>
+          </aside>
+
+          <div class="map-panel">
+            <div class="map-toolbar">
+              <div class="toolbar-left">
+                <span class="toolbar-title">Carte mondiale</span>
+                <span class="toolbar-sub">Vue globale - {{ pollutantInfo().name }}</span>
+              </div>
+              <button class="legend-toggle" type="button" (click)="toggleLegend()">
+                {{ showLegend() ? 'Masquer légende' : 'Afficher légende' }}
+              </button>
+            </div>
+
+            <div class="map-wrapper">
+              <div #mapContainer class="map-canvas"></div>
+            </div>
+          </div>
+        </div>
+
+        @if (showDetailsModal() && activeCity()) {
+          <div class="modal-backdrop" (click)="closeCityDetails()"></div>
+          <div class="modal-card" role="dialog" aria-modal="true">
+            <div class="modal-header">
+              <div>
+                <h2>{{ activeCity()!.cityName }}</h2>
+                <p>{{ activeCity()!.countryName }} - {{ activeCity()!.region }}</p>
+              </div>
+              <button class="modal-close" type="button" (click)="closeCityDetails()">x</button>
+            </div>
+            <div class="modal-grid">
+              <div class="modal-section">
+                <h3>Pollution</h3>
+                <div class="modal-row">PM2.5: {{ getCityPollution(activeCity()!.cityName, 'pm25') }} {{ pollutantInfoMap.pm25.unit }}</div>
+                <div class="modal-row">PM10: {{ getCityPollution(activeCity()!.cityName, 'pm10') }} {{ pollutantInfoMap.pm10.unit }}</div>
+                <div class="modal-row">NO2: {{ getCityPollution(activeCity()!.cityName, 'no2') }} {{ pollutantInfoMap.no2.unit }}</div>
+                <div class="modal-row">O3: {{ getCityPollution(activeCity()!.cityName, 'o3') }} {{ pollutantInfoMap.o3.unit }}</div>
+                <div class="modal-row">SO2: {{ getCityPollution(activeCity()!.cityName, 'so2') }} {{ pollutantInfoMap.so2.unit }}</div>
+                <div class="modal-row">CO: {{ getCityPollution(activeCity()!.cityName, 'co') }} {{ pollutantInfoMap.co.unit }}</div>
+              </div>
+              <div class="modal-section">
+                <h3>Indicateurs</h3>
+                <div class="modal-row">Population: {{ formatValue(activeCity()!.population) }}</div>
+                <div class="modal-row">Densite: {{ formatValue(activeCity()!.density) }} hab/km2</div>
+                <div class="modal-row">PIB/hab: {{ getCityIndicator(activeCity()!.cityName, 'gdpPerCapita') }} USD</div>
+                <div class="modal-row">Charbon: {{ getCityIndicator(activeCity()!.cityName, 'coalPct') }} %</div>
+                <div class="modal-row">Renouvelables: {{ getCityIndicator(activeCity()!.cityName, 'renewablePct') }} %</div>
+              </div>
+            </div>
+            <div class="modal-actions">
+              <button class="primary-btn" type="button" (click)="compareCity()">Comparer avec une autre ville</button>
+            </div>
+          </div>
+        }
+      </div>
+    }

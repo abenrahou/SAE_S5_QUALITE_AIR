@@ -1,0 +1,185 @@
+@if (isLoading()) {
+      <app-loading-spinner
+        title="Chargement des évolutions..."
+        message="Préparation des séries temporelles">
+      </app-loading-spinner>
+    }
+    @if (!isLoading()) {
+      <div class="page-container max-w-6xl mx-auto">
+        <div class="page-header">
+          <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">Évolutions temporelles</h1>
+          <p class="text-gray-600 dark:text-gray-400">
+            Analyse 2019-2023 et impact COVID-19 par polluant et ville.
+          </p>
+        </div>
+
+        <section class="filter-card">
+          <div class="filter-row">
+            <div class="filter-field">
+              <label for="pollutant">Polluant</label>
+              <select
+                id="pollutant"
+                [value]="selectedPollutant()"
+                (change)="onPollutantChange($event)">
+                @for (option of pollutantOptions(); track option.value) {
+                  <option [value]="option.value">{{ option.label }} ({{ option.unit }})</option>
+                }
+              </select>
+            </div>
+            <div class="filter-field">
+              <label for="country">Pays</label>
+              <select
+                id="country"
+                [value]="selectedCountry()"
+                (change)="onCountryChange($event)">
+                <option value="All">Tous</option>
+                @for (country of countries(); track country.code) {
+                  <option [value]="country.code">{{ country.name }}</option>
+                }
+              </select>
+            </div>
+            <div class="filter-field">
+              <label for="city-input">Villes</label>
+              <input id="city-input" list="city-list" placeholder="Paris, Delhi..." #cityInput>
+              <datalist id="city-list">
+                @for (name of filteredCityNames(); track name) {
+                  <option [value]="name"></option>
+                }
+              </datalist>
+            </div>
+            <button class="primary-btn" type="button" (click)="addCity(cityInput.value); cityInput.value = ''">Ajouter</button>
+            <button class="ghost-btn" type="button" (click)="resetCities()">Réinitialiser</button>
+          </div>
+          <div class="chip-row">
+            @for (city of selectedCities(); track city.cityName) {
+              <span class="chip">
+                {{ city.cityName }}
+                <button type="button" (click)="removeCity(city.cityName)">x</button>
+              </span>
+            }
+            @if (selectedCities().length === 0) {
+              <span class="empty">Aucune ville sélectionnée</span>
+            }
+          </div>
+          <div class="filter-footer">
+            <label class="toggle">
+              <input type="checkbox" [checked]="showCovid()"
+                (change)="onCovidToggle($event)">
+              <span>Mettre en avant 2020 (COVID)</span>
+            </label>
+            <div class="year-slider">
+              <label for="year-focus">Année focus</label>
+              <input
+                id="year-focus"
+                type="range"
+                min="2019"
+                max="2023"
+                step="1"
+                [value]="focusYear()"
+                (input)="onFocusYearInput($event)">
+              <span>{{ focusYear() }}</span>
+            </div>
+            <button class="ghost-btn" type="button" (click)="togglePlay()">
+              {{ isPlaying() ? 'Pause' : 'Play' }}
+            </button>
+          </div>
+        </section>
+
+        <section class="chart-section">
+          <div class="section-header">
+            <div>
+              <h2>Serie temporelle</h2>
+              <p>{{ pollutantInfo().name }} ({{ pollutantInfo().unit }}) - 2019 a 2023</p>
+            </div>
+          </div>
+          @if (selectedCities().length === 0) {
+            <div class="empty-state">Ajoutez au moins une ville pour afficher la serie temporelle.</div>
+          }
+          <div class="chart-legend">
+            <span class="legend-swatch"></span>
+            <span>Zone grisée : années hors période de données disponibles</span>
+          </div>
+          <div class="chart-canvas">
+            <canvas
+              baseChart
+              [type]="lineChart.type"
+              [data]="lineChart.data"
+              [options]="lineChart.options"
+              [plugins]="lineChart.plugins">
+            </canvas>
+          </div>
+        </section>
+
+        <section class="chart-section">
+          <div class="section-header">
+            <div>
+              <h2>Variations annuelles</h2>
+              <p>Évolution moyenne des villes sélectionnées</p>
+            </div>
+          </div>
+          <div class="chart-canvas">
+            <canvas baseChart [type]="variationChart.type" [data]="variationChart.data" [options]="variationChart.options"></canvas>
+          </div>
+        </section>
+
+        <section class="covid-section">
+          <div class="section-header">
+            <div>
+              <h2>Avant / pendant / apres COVID</h2>
+              <p>Moyenne des villes sélectionnées</p>
+            </div>
+          </div>
+          <div class="covid-grid">
+            <div class="covid-card">
+              <span class="tag">2019</span>
+              <strong>{{ formatValue(covidStats().before) }}</strong>
+              <span class="unit">{{ pollutantInfo().unit }}</span>
+            </div>
+            <div class="covid-card highlight">
+              <span class="tag">2020 (COVID)</span>
+              <strong>{{ formatValue(covidStats().during) }}</strong>
+              <span class="unit">{{ pollutantInfo().unit }}</span>
+            </div>
+            <div class="covid-card">
+              <span class="tag">2021-2023</span>
+              <strong>{{ formatValue(covidStats().after) }}</strong>
+              <span class="unit">{{ pollutantInfo().unit }}</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="hypothesis-card">
+          <h3>Hypothèse COVID</h3>
+          <p class="hypothesis-subtitle">{{ covidHypothesis().title }}</p>
+          <ul>
+            @for (item of covidHypothesis().lines; track item) {
+              <li>{{ item }}</li>
+            }
+          </ul>
+        </section>
+
+        <section class="limit-card">
+          <h3>Limites et lecture</h3>
+          <ul>
+            <li>Les courbes utilisent des moyennes annuelles: pas de saisonnalite intra-année.</li>
+            <li>Le marqueur COVID met en avant 2020 comme proxy de la période.</li>
+            <li>Les données sont inégales selon les villes: certaines années manquent.</li>
+            <li>Les tendances restent descriptives, pas causales.</li>
+          </ul>
+        </section>
+
+        <section class="analysis-card">
+          <h3>Analyse automatique</h3>
+          <p class="analysis-subtitle">{{ analysisTitle() }}</p>
+          @if (analysisMissing()) {
+            <p class="analysis-missing">{{ analysisMissing() }}</p>
+          }
+          <ul>
+            @for (item of analysisLines(); track item) {
+              <li>{{ item }}</li>
+            }
+          </ul>
+          <p class="analysis-summary">{{ analysisSummary() }}</p>
+        </section>
+      </div>
+    }

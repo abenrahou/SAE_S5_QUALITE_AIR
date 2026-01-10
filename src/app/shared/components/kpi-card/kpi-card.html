@@ -1,0 +1,23 @@
+<div
+  [class]="'kpi-card p-6 rounded-lg border-2 shadow-md transition-all duration-300 hover:shadow-lg hover:scale-105 ' + containerClass()">
+
+  <!-- Icon -->
+  <div class="mb-3">
+    <app-icon [name]="icon()" [iconClass]="'!w-12 !h-12 ' + textColorClass()"></app-icon>
+  </div>
+
+  <!-- Value -->
+  <div [class]="'text-3xl font-bold mb-2 animate-count-up ' + textColorClass()">
+    {{ displayedValue() }}
+  </div>
+
+  <!-- Label -->
+  <div class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-1">
+    {{ label() }}
+  </div>
+
+  <!-- Subtext -->
+  <div class="text-xs text-gray-500 dark:text-gray-400">
+    {{ subtext() }}
+  </div>
+</div>

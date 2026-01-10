@@ -1,0 +1,423 @@
+@if (isLoading()) {
+      <app-loading-spinner
+        title="Chargement des prédictions..."
+        message="Préparation des modèles">
+      </app-loading-spinner>
+    }
+    @if (!isLoading()) {
+      <div class="page-container">
+        <header class="page-header">
+          <div>
+            <h1>Modèles predictifs</h1>
+            <p>Simuler des scenarios et comparer les modèles.</p>
+          </div>
+          <button class="info-btn" type="button" (click)="openInfo()">i</button>
+        </header>
+
+        <section class="panel simulator">
+          <div class="panel-header">
+            <div>
+              <h2>Simulateur de pollution</h2>
+              <p>Ajustez les paramètres et observez la prédiction {{ pollutantInfo().name }}.</p>
+            </div>
+            <div class="panel-controls">
+              <label class="select-label">
+                Modèle:
+                <select [value]="selectedModel()" (change)="onModelChange($event)">
+                  @for (model of models(); track model.key) {
+                    <option [value]="model.key" [selected]="model.key === selectedModel()">{{ model.label }}</option>
+                  }
+                </select>
+              </label>
+              <label class="select-label">
+                Polluant:
+                <select [value]="selectedPollutant()" (change)="onPollutantChange($event)">
+                  @for (pollutant of pollutantOptions; track pollutant.value) {
+                    <option [value]="pollutant.value" [selected]="pollutant.value === selectedPollutant()">{{ pollutant.label }}</option>
+                  }
+                </select>
+              </label>
+              <label class="select-label">
+                Variables:
+                <select [value]="featureScope()" (change)="onFeatureScopeChange($event)">
+                  <option value="basic">Essentiel ({{ featureCountLabel('basic') }})</option>
+                  <option value="extended">Etendu ({{ featureCountLabel('extended') }})</option>
+                  <option value="full">Exhaustif ({{ featureCountLabel('full') }})</option>
+                </select>
+              </label>
+              @if (scopeNote()) {
+                <span class="scope-note">{{ scopeNote() }}</span>
+              }
+              <label class="select-label">
+                Categorie:
+                <select [value]="categoryFilter()" (change)="onCategoryFilterChange($event)">
+                  <option value="all">Toutes</option>
+                  @for (category of availableCategories(); track category) {
+                    <option [value]="category">{{ categoryLabel(category) }}</option>
+                  }
+                </select>
+              </label>
+              <button class="ghost-btn mini" type="button" (click)="autoSelectFeatures()">Auto</button>
+              @if (featureOverrideKeys() && featureOverrideKeys()!.length) {
+                <span class="auto-badge">Auto actif</span>
+                <button class="ghost-btn mini" type="button" (click)="resetAuto()">Reset auto</button>
+              }
+            </div>
+          </div>
+
+          <div class="sim-layout">
+            <div class="sim-left">
+              @if (autoActive()) {
+                <div class="auto-card">
+                  <div class="auto-title">Auto: variables les plus explicatives</div>
+                  <div class="auto-list">
+                    @for (item of autoFeatureList(); track item.key) {
+                      <div class="auto-item">
+                        <span>{{ item.label }}</span>
+                        <span class="mono">{{ formatPercent(item.score) }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+              <div class="sim-grid">
+                @for (feature of sortedFeatureConfigs(); track feature.key) {
+                  <div class="slider-card" [class.inactive]="!isFeatureActive(feature.key)" [class.active]="autoActive() && isFeatureActive(feature.key)">
+                    <div class="slider-header">
+                      <span class="slider-label">
+                        {{ feature.label }}
+                        @if (autoActive()) {
+                          <span class="slider-chip" [class.on]="isFeatureActive(feature.key)">
+                            {{ isFeatureActive(feature.key) ? 'Actif' : 'Inactif' }}
+                          </span>
+                        }
+                      </span>
+                      <span class="mono">{{ formatValue(feature.key) }} {{ feature.unit }}</span>
+                    </div>
+                    <div class="slider-range">
+                      <span class="slider-boundary">{{ formatRangeValue(feature.min) }}</span>
+                      <input
+                        type="range"
+                        [min]="feature.min"
+                        [max]="feature.max"
+                        [step]="feature.step"
+                        [value]="featureValues()[feature.key]"
+                        [disabled]="!isFeatureActive(feature.key)"
+                        (input)="onFeatureInput(feature.key, $event)">
+                      <span class="slider-boundary">{{ formatRangeValue(feature.max) }}</span>
+                    </div>
+                    <div class="slider-meta">
+                      <span>Couverture: {{ formatPercent(feature.coverage) }}</span>
+                      <span class="mono">Moy: {{ formatRangeValue(feature.mean) }}</span>
+                    </div>
+                    @if (!isFeatureActive(feature.key)) {
+                      <div class="slider-note">Inactif pour ce modèle</div>
+                    }
+                  </div>
+                }
+                @if (sortedFeatureConfigs().length === 0) {
+                  <div class="empty-state">
+                    Aucune variable disponible pour ce filtre. Ajustez la categorie ou le scope.
+                  </div>
+                }
+              </div>
+            </div>
+            <div class="sim-right">
+              <div class="prediction-card">
+                <div>
+                  <div class="prediction-title">Prédiction {{ pollutantInfo().name }}</div>
+                  <div class="prediction-value">
+                    {{ predictedValue() | number:'1.1-1' }} {{ pollutantInfo().unit }}
+                  </div>
+                  <div class="prediction-badge" [style.background]="predictionBadge().color">
+                    {{ predictionBadge().label }}
+                  </div>
+                </div>
+                <div class="confidence">
+                  Intervalle 95%: {{ confidenceInterval().low | number:'1.1-1' }} -
+                  {{ confidenceInterval().high | number:'1.1-1' }} {{ pollutantInfo().unit }}
+                </div>
+                <div class="legend">
+                  <div class="legend-title">Seuils OMS</div>
+                  <div class="legend-list">
+                    @for (item of qualityLegend(); track item.label) {
+                      <div class="legend-item">
+                        <span class="legend-dot" [style.background]="item.color"></span>
+                        <span class="legend-label">{{ item.label }}</span>
+                        <span class="legend-range">
+                          {{ item.isUpper ? '<=' : '>' }}
+                          {{ item.value | number:'1.1-1' }} {{ pollutantInfo().unit }}
+                        </span>
+                      </div>
+                    }
+                  </div>
+                </div>
+                <div class="sim-actions">
+                  <button class="ghost-btn" type="button" (click)="resetSimulation()">Réinitialiser</button>
+                  <button class="ghost-btn" type="button" (click)="saveSimulation()">Ajouter a l'historique</button>
+                </div>
+              </div>
+              @if (uncertaintyWarning()) {
+                <div class="warning-card">Incertitude élevée: intervalle large par rapport aux données.</div>
+              }
+
+              <div class="compare-card">
+                <label class="select-label">
+                  Comparer avec une ville:
+                  <select [value]="selectedCity()" (change)="onCityChange($event)">
+                    <option value="">Aucune</option>
+                    @for (city of cityOptions(); track city.cityName) {
+                      <option [value]="city.cityName">{{ city.cityName }}</option>
+                    }
+                  </select>
+                </label>
+                @if (modelNote()) {
+                  <div class="model-note">{{ modelNote() }}</div>
+                }
+                @if (cityComparison()) {
+                  <div class="city-compare">
+                    <span>{{ pollutantInfo().name }} reel: {{ cityComparison()!.actual | number:'1.1-1' }} {{ pollutantInfo().unit }}</span>
+                    <span>Écart: {{ cityComparison()!.delta | number:'1.1-1' }} {{ pollutantInfo().unit }}</span>
+                  </div>
+                }
+                @if (selectedCity() && !cityComparison()) {
+                  <div class="compare-empty">Pas de mesure disponible pour ce polluant.</div>
+                }
+                @if (!selectedCity()) {
+                  <div class="compare-empty">Choisissez une ville pour comparer la prédiction.</div>
+                }
+              </div>
+
+            <div class="scenario-row">
+              <button class="scenario-btn" type="button" (click)="applyScenario('green')">Scenario vert</button>
+              <button class="scenario-btn" type="button" (click)="applyScenario('worst')">Scenario pire cas</button>
+            </div>
+
+              <div class="preprocess-card">
+                <div class="preprocess-title">Prétraitements & données</div>
+                <div class="preprocess-list">
+                  <div>Validation croisee: k={{ foldCount() }} (n={{ validCityCount() }})</div>
+                  <div>Variables actives: {{ selectedFeatureKeys().length }} / {{ totalFeatureCount() }}</div>
+                  <div>Variables exclues (couverture & filtre): {{ excludedFeatureCount() }}</div>
+                  <div>Seuil couverture: {{ coverageThresholdLabel() }}</div>
+                  <div>Imputation: valeurs manquantes remplacees par la moyenne.</div>
+                  <div>Normalisation: z-score pour k-NN et Random Forest.</div>
+                  <div>MLP/CNN non intégrés: données tabulaires et volume limite.</div>
+                </div>
+              </div>
+              @if (lowSampleWarning()) {
+                <div class="warning-card">Échantillon réduit: les résultats peuvent être instables.</div>
+              }
+
+              <div class="history">
+                <div class="history-title">Historique simulations</div>
+                <div class="history-list">
+                  @for (item of history(); track item.id) {
+                    <div class="history-item">
+                      <span>{{ item.label }}</span>
+                      <span class="mono">{{ item.value | number:'1.1-1' }} {{ item.unit }}</span>
+                    </div>
+                  }
+                  @if (history().length === 0) {
+                    <span class="history-empty">Aucune simulation sauvegardee.</span>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>Comparaison des modèles</h2>
+              <p>Qualité de prédiction sur les villes disponibles (n={{ validCityCount() }})</p>
+            </div>
+            <button class="info-btn" type="button" (click)="openMetricsInfo()">i</button>
+          </div>
+          @if (bestModel()) {
+            <div class="best-model-card">
+              <div class="best-model-title">Meilleur modèle pour {{ pollutantInfo().name }}</div>
+              <div class="best-model-row">
+                <span class="best-model-name">{{ bestModel()!.label }}</span>
+                <span class="best-model-metric">R2 {{ bestModel()!.r2Mean | number:'1.2-2' }}</span>
+              </div>
+              <div class="best-model-metrics">
+                <span>MAE {{ bestModel()!.maeMean | number:'1.1-1' }}</span>
+                <span>RMSE {{ bestModel()!.rmseMean | number:'1.1-1' }}</span>
+              </div>
+              <div class="best-model-note">Sélection basee sur le R2 moyen en validation croisee.</div>
+            </div>
+          }
+          <div class="limit-card">
+            <div class="limit-title">Limites et lecture des résultats</div>
+            <div class="limit-list">
+              <div>n varie selon le polluant: certains modèles generalisent mal avec peu d'observations.</div>
+              <div>Beaucoup de variables et données manquantes: imputation par la moyenne peut diluer le signal.</div>
+              <div>Correlation n'est pas causalite: les variables "importantes" restent des associations.</div>
+              <div>R2 négatif = modèle moins bon que la moyenne: a interpréter comme un signal faible.</div>
+              <div>k-NN et Random Forest reagissent au choix des variables et a la normalisation.</div>
+            </div>
+          </div>
+          <div class="chart-canvas tall">
+            <canvas baseChart [type]="r2Chart.type" [data]="r2Chart.data" [options]="r2Chart.options"></canvas>
+          </div>
+          <div class="table">
+            <div class="table-row table-head">
+              <span>Modèle</span>
+                <span>R2 (moy +/- écart)</span>
+                <span>MAE (moy +/- écart)</span>
+                <span>RMSE (moy +/- écart)</span>
+                <span>Variables</span>
+            </div>
+            @for (model of models(); track model.key) {
+              <div class="table-row">
+                <span>{{ model.label }}</span>
+                <span>{{ model.r2Mean | number:'1.2-2' }} +/- {{ model.r2Std | number:'1.2-2' }}</span>
+                <span>{{ model.maeMean | number:'1.1-1' }} +/- {{ model.maeStd | number:'1.1-1' }}</span>
+                <span>{{ model.rmseMean | number:'1.1-1' }} +/- {{ model.rmseStd | number:'1.1-1' }}</span>
+                <span>{{ modelVariables(model.key) }}</span>
+              </div>
+            }
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>Importance des variables</h2>
+              <p>Contribution estimee du modèle Random Forest pour {{ pollutantInfo().name }}</p>
+            </div>
+            <button class="info-btn" type="button" (click)="openImportanceInfo()">i</button>
+          </div>
+          <div class="chart-canvas">
+            <canvas baseChart [type]="importanceChart.type" [data]="importanceChart.data" [options]="importanceChart.options"></canvas>
+          </div>
+        </section>
+      </div>
+    }
+
+    @if (infoOpen()) {
+      <div class="modal-backdrop" (click)="closeInfo()"></div>
+      <div class="modal">
+        <div class="modal-header">
+          <div>
+            <h3>Comment fonctionne le simulateur</h3>
+            <p>Modèles de régression et prédiction {{ pollutantInfo().name }}</p>
+          </div>
+          <button class="ghost-btn" type="button" (click)="closeInfo()">Fermer</button>
+        </div>
+        <div class="modal-body">
+          <div class="info-block">
+            <h4>Regression lineaire</h4>
+            <p>
+              On cherche une droite y = a + b x qui minimise l'erreur quadratique.
+              Ici, x correspond a un indicateur (ex: part de charbon) et y a {{ pollutantInfo().name }}.
+            </p>
+          </div>
+          <div class="info-block">
+            <h4>k-NN régression</h4>
+            <p>
+              Prédiction = moyenne des k villes les plus proches (distance euclidienne).
+              Cette methode est non parametrique (pas d'entraînement explicite).
+            </p>
+          </div>
+          <div class="info-block">
+            <h4>Arbres et forets aleatoires</h4>
+            <p>
+              Un arbre coupe l'espace selon des regles "si/alors". La foret combine plusieurs arbres
+              entraînés sur des échantillons différents (bagging) pour stabiliser la prédiction.
+            </p>
+            <ul class="info-list">
+              <li>Normalisation z-score des variables pour equilibrer les echelles.</li>
+              <li>Seuils testes = quantiles (10% a 90%) pour capter plus de splits.</li>
+              <li>Valeurs manquantes remplacees par la moyenne de la variable.</li>
+              <li>Arrets si peu d'observations pour eviter l'overfitting.</li>
+            </ul>
+            <div class="info-grid">
+              <div class="info-card">
+                <div class="formula">H = -sum(p_k log2 p_k)</div>
+                <p class="formula-note">
+                  Entropie: mesure l'impurete d'un noeud.
+                </p>
+              </div>
+              <div class="info-card">
+                <div class="formula">G = 1 - sum(p_k^2)</div>
+                <p class="formula-note">
+                  Indice de Gini: autre mesure d'impurete.
+                </p>
+              </div>
+              <div class="info-card">
+                <div class="formula">Gain = I(parent) - sum((n_i/n) I(i))</div>
+                <p class="formula-note">
+                  Gain d'information utilis? pour choisir les splits.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (metricsInfoOpen()) {
+      <div class="modal-backdrop" (click)="closeMetricsInfo()"></div>
+      <div class="modal">
+        <div class="modal-header">
+          <div>
+            <h3>Métriques d'évaluation</h3>
+            <p>Comment lire R2, MAE et RMSE</p>
+          </div>
+          <button class="ghost-btn" type="button" (click)="closeMetricsInfo()">Fermer</button>
+        </div>
+        <div class="modal-body">
+          <div class="info-grid">
+            <div class="info-card">
+              <div class="formula">R2 = 1 - (SSres / SStot)</div>
+              <p class="formula-note">
+                Plus R2 est proche de 1, meilleure est la prédiction.
+              </p>
+            </div>
+            <div class="info-card">
+              <div class="formula">MAE = moyenne(|y - yhat|)</div>
+              <p class="formula-note">
+                Erreur absolue moyenne (en {{ pollutantInfo().unit }}).
+              </p>
+            </div>
+            <div class="info-card">
+              <div class="formula">RMSE = racine(moyenne((y - yhat)^2))</div>
+              <p class="formula-note">
+                Punit davantage les grosses erreurs (en {{ pollutantInfo().unit }}).
+              </p>
+            </div>
+          </div>
+          <div class="info-hint">
+            Les métriques affichent la performance moyenne en validation croisee (k-fold).
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (importanceInfoOpen()) {
+      <div class="modal-backdrop" (click)="closeImportanceInfo()"></div>
+      <div class="modal">
+        <div class="modal-header">
+          <div>
+            <h3>Importance des variables</h3>
+            <p>Pourquoi certaines variables dominent</p>
+          </div>
+          <button class="ghost-btn" type="button" (click)="closeImportanceInfo()">Fermer</button>
+        </div>
+        <div class="modal-body">
+          <div class="info-block">
+            <p>
+              L'importance est estimee par la réduction d'erreur lors des splits des arbres.
+              Plus une variable est souvent utilisée et réduit l'erreur, plus son importance est elevée.
+            </p>
+          </div>
+          <div class="info-hint">
+            Ces valeurs sont normalisees pour totaliser 100%.
+          </div>
+        </div>
+      </div>
+    }

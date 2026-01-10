@@ -1,0 +1,239 @@
+.page-container {
+      padding: 32px;
+      animation: fadeIn 0.4s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .tabs {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .pollutant-select {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      font-size: 13px;
+      color: #0f172a;
+    }
+
+    .pollutant-select label {
+      font-weight: 600;
+    }
+
+    .pollutant-select select {
+      border: none;
+      background: transparent;
+      font-weight: 600;
+      color: inherit;
+      outline: none;
+    }
+
+    .tab-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid #e2e8f0;
+      border-radius: 999px;
+      padding: 10px 16px;
+      background: #f8fafc;
+      color: #0f172a;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-button:hover {
+      border-color: #94a3b8;
+    }
+
+    .tab-active {
+      background: #0f172a;
+      color: #f8fafc;
+      border-color: #0f172a;
+    }
+
+    .axis-header {
+      display: grid;
+      gap: 16px;
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 24px;
+    }
+
+    .axis-title {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .axis-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+    }
+
+    .axis-hypothesis {
+      background: #f8fafc;
+      border-radius: 14px;
+      padding: 14px 16px;
+      border: 1px dashed #cbd5f5;
+      color: #475569;
+    }
+
+    .axis-pollutant {
+      font-size: 13px;
+      color: #475569;
+    }
+
+    .hypothesis-label {
+      display: inline-block;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 11px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .chart-card {
+      background: white;
+      border-radius: 18px;
+      padding: 18px;
+      border: 1px solid #e2e8f0;
+      display: grid;
+      gap: 12px;
+    }
+
+    .chart-card canvas {
+      width: 100% !important;
+      height: 220px !important;
+    }
+
+    .chart-footer {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .insight-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .insight-card {
+      background: white;
+      border-radius: 18px;
+      padding: 18px;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+    }
+
+    .insight-card ul {
+      margin: 12px 0 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 8px;
+      font-size: 14px;
+      color: #475569;
+    }
+
+    .insight-card.emphasis {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.05), rgba(59, 130, 246, 0.08));
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    :host-context(.dark) .tab-button {
+      background: #0f172a;
+      color: #e2e8f0;
+      border-color: rgba(148, 163, 184, 0.2);
+    }
+
+    :host-context(.dark) .pollutant-select {
+      background: #0f172a;
+      border-color: rgba(148, 163, 184, 0.2);
+      color: #e2e8f0;
+    }
+
+    :host-context(.dark) .pollutant-select select {
+      color: #e2e8f0;
+    }
+
+    :host-context(.dark) .pollutant-select select option {
+      background: #0f172a;
+      color: #e2e8f0;
+    }
+
+    :host-context(.dark) .tab-active {
+      background: #38bdf8;
+      color: #0f172a;
+      border-color: #38bdf8;
+    }
+
+    :host-context(.dark) .axis-header,
+    :host-context(.dark) .chart-card,
+    :host-context(.dark) .insight-card {
+      background: #0f172a;
+      border-color: rgba(148, 163, 184, 0.2);
+    }
+
+    :host-context(.dark) .axis-hypothesis {
+      background: #0b1120;
+      border-color: rgba(148, 163, 184, 0.2);
+      color: #cbd5f5;
+    }
+
+    :host-context(.dark) .axis-pollutant {
+      color: #cbd5f5;
+    }
+
+    :host-context(.dark) .hypothesis-label {
+      color: #e2e8f0;
+    }
+
+    :host-context(.dark) .chart-footer {
+      color: #94a3b8;
+    }
+
+    :host-context(.dark) .insight-card {
+      color: #e2e8f0;
+    }
+
+    :host-context(.dark) .insight-card ul {
+      color: #cbd5f5;
+    }
+
+    @media (max-width: 768px) {
+      .page-container {
+        padding: 24px;
+      }
+    }

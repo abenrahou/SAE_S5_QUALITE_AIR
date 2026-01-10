@@ -1,0 +1,30 @@
+<div class="animate-pulse">
+  @if (type() === 'card') {
+    <div class="space-y-4">
+      <div class="h-32 bg-gray-300 dark:bg-gray-700 rounded-lg"></div>
+    </div>
+  }
+
+  @if (type() === 'text') {
+    <div class="space-y-3">
+      <div class="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4"></div>
+      <div class="h-4 bg-gray-300 dark:bg-gray-700 rounded"></div>
+      <div class="h-4 bg-gray-300 dark:bg-gray-700 rounded w-5/6"></div>
+    </div>
+  }
+
+  @if (type() === 'chart') {
+    <div class="space-y-4">
+      <div class="h-64 bg-gray-300 dark:bg-gray-700 rounded-lg"></div>
+    </div>
+  }
+
+  @if (type() === 'table') {
+    <div class="space-y-2">
+      <div class="h-8 bg-gray-300 dark:bg-gray-700 rounded"></div>
+      <div class="h-8 bg-gray-200 dark:bg-gray-600 rounded"></div>
+      <div class="h-8 bg-gray-200 dark:bg-gray-600 rounded"></div>
+      <div class="h-8 bg-gray-200 dark:bg-gray-600 rounded"></div>
+    </div>
+  }
+</div>
