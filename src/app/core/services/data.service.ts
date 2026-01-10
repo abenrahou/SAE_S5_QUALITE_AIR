@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, forkJoin, of, timeout } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
@@ -14,6 +15,7 @@ export interface DatasetRow {
 })
 export class DataService {
   private readonly http = inject(HttpClient);
+  private readonly document = inject(DOCUMENT);
 
   // Observable streams for data
   private datasetsLoaded$ = new BehaviorSubject<boolean>(false);
@@ -36,8 +38,8 @@ export class DataService {
     this.errorSubject$.next(null);
 
     return forkJoin({
-      final: this.loadCSV('/assets/data/DATASET_FINAL_5ANS_2019_2023_AVEC_COVID.csv'),
-      annual: this.loadCSV('/assets/data/DATASET_ANNUEL_2019_2023_AVEC_COVID.csv')
+      final: this.loadCSV('assets/data/DATASET_FINAL_5ANS_2019_2023_AVEC_COVID.csv'),
+      annual: this.loadCSV('assets/data/DATASET_ANNUEL_2019_2023_AVEC_COVID.csv')
     }).pipe(
       timeout(10000),
       map(({ final, annual }) => {
@@ -69,7 +71,8 @@ export class DataService {
    * Load a single CSV file
    */
   private loadCSV(path: string): Observable<DatasetRow[]> {
-    return this.http.get(path, { responseType: 'text' }).pipe(
+    const url = new URL(path, this.document.baseURI).toString();
+    return this.http.get(url, { responseType: 'text' }).pipe(
       map(csvText => {
         const result = Papa.parse(csvText, {
           header: true,
