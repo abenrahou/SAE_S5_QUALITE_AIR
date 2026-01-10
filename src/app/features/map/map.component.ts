@@ -222,13 +222,17 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!this.mapContainer?.nativeElement) return;
     if (this.map) return;
 
-    this.configureLeafletAssets();
+    const assetInfo = this.configureLeafletAssets();
+    console.log('[Map] Base href:', this.document.baseURI);
+    console.log('[Map] Leaflet icons:', assetInfo);
     this.map = L.map(this.mapContainer.nativeElement, {
       zoomControl: false,
       worldCopyJump: true
     }).setView([20, 0], 2);
 
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    const tileUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+    console.log('[Map] Tile URL:', tileUrl);
+    L.tileLayer(tileUrl, {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(this.map);
 
@@ -238,21 +242,23 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     setTimeout(() => this.map?.invalidateSize(), 0);
   }
 
-  private configureLeafletAssets(): void {
+  private configureLeafletAssets(): { iconUrl: string; iconRetinaUrl: string; shadowUrl: string } {
     if (!this.mapContainer?.nativeElement) return;
     const baseUri = this.document.baseURI || '/';
     const resolve = (path: string) => new URL(path, baseUri).toString();
 
-    L.Icon.Default.mergeOptions({
-      iconRetinaUrl: resolve('assets/leaflet/marker-icon-2x.png'),
-      iconUrl: resolve('assets/leaflet/marker-icon.png'),
-      shadowUrl: resolve('assets/leaflet/marker-shadow.png')
-    });
+    const iconRetinaUrl = resolve('assets/leaflet/marker-icon-2x.png');
+    const iconUrl = resolve('assets/leaflet/marker-icon.png');
+    const shadowUrl = resolve('assets/leaflet/marker-shadow.png');
+
+    L.Icon.Default.mergeOptions({ iconRetinaUrl, iconUrl, shadowUrl });
 
     const container = this.mapContainer.nativeElement;
-    container.style.setProperty('--marker-icon-url', `url("${resolve('assets/leaflet/marker-icon.png')}")`);
-    container.style.setProperty('--marker-icon-2x-url', `url("${resolve('assets/leaflet/marker-icon-2x.png')}")`);
-    container.style.setProperty('--marker-shadow-url', `url("${resolve('assets/leaflet/marker-shadow.png')}")`);
+    container.style.setProperty('--marker-icon-url', `url("${iconUrl}")`);
+    container.style.setProperty('--marker-icon-2x-url', `url("${iconRetinaUrl}")`);
+    container.style.setProperty('--marker-shadow-url', `url("${shadowUrl}")`);
+
+    return { iconUrl, iconRetinaUrl, shadowUrl };
   }
 
   private addLegendControl(pollutant: PollutantType): void {
