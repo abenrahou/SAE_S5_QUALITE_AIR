@@ -16,10 +16,10 @@ import { ChartConfiguration } from 'chart.js';
 import * as Plotly from 'plotly.js-dist-min';
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
 import { DataService } from '../../core/services/data.service';
-import { City, Indicator, PollutantType } from '../../core/models';
+import { City, Indicator, PollutantType, POLLUTANT_INFO, getQualityLevel } from '../../core/models';
 import { StatsUtils } from '../../shared/utils/stats.utils';
 
-type ColorMode = 'region' | 'development' | 'urbanization' | 'pm25';
+type ColorMode = 'region' | 'development' | 'urbanization' | PollutantType;
 
 interface FeatureDefinition {
   key: string;
@@ -131,7 +131,7 @@ export class MultivariateComponent implements OnInit, AfterViewInit {
   });
 
   setColorMode(value: string): void {
-    if (['region', 'development', 'urbanization', 'pm25'].includes(value)) {
+    if (['region', 'development', 'urbanization', 'pm25', 'pm10', 'no2', 'o3', 'so2', 'co'].includes(value)) {
       this.colorMode.set(value as ColorMode);
       this.buildScatterChart();
     }
@@ -481,12 +481,17 @@ export class MultivariateComponent implements OnInit, AfterViewInit {
         return row.indicator?.developmentLevel ?? 'Inconnu';
       case 'urbanization':
         return row.indicator?.urbanizationLevel ?? 'Inconnu';
-      case 'pm25': {
-        const value = row.pollution.get('pm25') ?? 0;
-        if (value < 12) return 'PM2.5 faible';
-        if (value < 35) return 'PM2.5 modere';
-        if (value < 55) return 'PM2.5 eleve';
-        return 'PM2.5 tres eleve';
+      case 'pm25':
+      case 'pm10':
+      case 'no2':
+      case 'o3':
+      case 'so2':
+      case 'co': {
+        const pollutant = mode as PollutantType;
+        const value = row.pollution.get(pollutant) ?? 0;
+        const label = POLLUTANT_INFO[pollutant].name;
+        const level = getQualityLevel(value, pollutant);
+        return `${label} ${level}`;
       }
       case 'region':
       default:
