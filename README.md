@@ -41,12 +41,5 @@ npm run build
 - `src/app/core/` : services et modeles
 - `public/assets/data/` : donnees CSV
 
-## Deploiement GitHub Pages
-Exemple (a adapter a votre configuration) :
-```bash
-npm run build
-# Publier le dossier dist/ avec GitHub Pages
-```
-
 ## Support
 Contact : `equipeabrahams@gmail.com`
