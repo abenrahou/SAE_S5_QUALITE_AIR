@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Redirecting...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+      (function() {
+        const base = '/SAE_S5_QUALITE_AIR/';
+        const path = window.location.pathname;
+        const stripped = path.startsWith(base) ? path.slice(base.length) : path.replace(/^\//, '');
+        const query = window.location.search || '';
+        const hash = window.location.hash || '';
+        const target = `${base}?/${encodeURIComponent(stripped)}${query}${hash}`;
+        window.location.replace(target);
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>
