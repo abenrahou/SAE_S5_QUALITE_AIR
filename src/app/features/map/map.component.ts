@@ -92,7 +92,10 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly aboveThresholdPct = signal(0);
 
   private readonly renderEffect = effect(() => {
-    if (!this.dataReady() || !this.mapReady()) return;
+    const dataReady = this.dataReady();
+    const mapReady = this.mapReady();
+    console.log('[Map] Effect tick:', { dataReady, mapReady });
+    if (!dataReady || !mapReady) return;
     const filteredCities = this.getFilteredCities();
     this.renderLayers(filteredCities);
     this.updateStats(filteredCities);
@@ -112,10 +115,12 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   });
 
   ngOnInit(): void {
+    console.log('[Map] Init - data loaded?', this.dataService.isLoaded());
     if (this.dataService.isLoaded()) {
       this.initializeData();
     } else {
       this.dataService.isLoaded$.subscribe(isLoaded => {
+        console.log('[Map] isLoaded$ update:', isLoaded);
         if (isLoaded) {
           this.initializeData();
         }
@@ -244,6 +249,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     L.control.zoom({ position: 'topright' }).addTo(this.map);
     this.mapReady.set(true);
+    console.log('[Map] Map ready');
 
     setTimeout(() => this.map?.invalidateSize(), 0);
   }
