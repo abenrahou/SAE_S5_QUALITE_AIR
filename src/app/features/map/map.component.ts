@@ -242,8 +242,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     setTimeout(() => this.map?.invalidateSize(), 0);
   }
 
-  private configureLeafletAssets(): { iconUrl: string; iconRetinaUrl: string; shadowUrl: string } {
-    if (!this.mapContainer?.nativeElement) return;
+  private configureLeafletAssets(): { iconUrl: string; iconRetinaUrl: string; shadowUrl: string } | null {
+    if (!this.mapContainer?.nativeElement) return null;
     const baseUri = this.document.baseURI || '/';
     const resolve = (path: string) => new URL(path, baseUri).toString();
 
