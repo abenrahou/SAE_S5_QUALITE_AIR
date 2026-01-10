@@ -94,7 +94,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly renderEffect = effect(() => {
     const dataReady = this.dataReady();
     const mapReady = this.mapReady();
-    console.log('[Map] Effect tick:', { dataReady, mapReady });
+    console.log('[Map] Effect tick:', JSON.stringify({ dataReady, mapReady }));
     if (!dataReady || !mapReady) return;
     const filteredCities = this.getFilteredCities();
     this.renderLayers(filteredCities);
@@ -236,6 +236,11 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     const assetInfo = this.configureLeafletAssets();
     console.log('[Map] Base href:', this.document.baseURI);
     console.log('[Map] Leaflet icons:', assetInfo);
+    const containerRect = this.mapContainer.nativeElement.getBoundingClientRect();
+    console.log('[Map] Container size:', {
+      width: Math.round(containerRect.width),
+      height: Math.round(containerRect.height)
+    });
     this.map = L.map(this.mapContainer.nativeElement, {
       zoomControl: false,
       worldCopyJump: true
@@ -243,9 +248,17 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const tileUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
     console.log('[Map] Tile URL:', tileUrl);
-    L.tileLayer(tileUrl, {
+    const tileLayer = L.tileLayer(tileUrl, {
       attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(this.map);
+    });
+    tileLayer.on('tileerror', event => {
+      const tileSrc = (event as { tile?: HTMLImageElement }).tile?.src;
+      console.warn('[Map] Tile error:', { tileSrc });
+    });
+    tileLayer.on('load', () => {
+      console.log('[Map] Tiles loaded');
+    });
+    tileLayer.addTo(this.map);
 
     L.control.zoom({ position: 'topright' }).addTo(this.map);
     this.mapReady.set(true);
