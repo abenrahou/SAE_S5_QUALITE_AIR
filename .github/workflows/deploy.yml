@@ -50,7 +50,9 @@ jobs:
           ls -la "$DIST_DIR"
           test -f "$DIST_DIR/index.html"
 
-          cp "$DIST_DIR/index.html" "$DIST_DIR/404.html"
+          if [ ! -f "$DIST_DIR/404.html" ]; then
+            cp "$DIST_DIR/index.html" "$DIST_DIR/404.html"
+          fi
           touch "$DIST_DIR/.nojekyll"
 
       - uses: actions/upload-pages-artifact@v3
