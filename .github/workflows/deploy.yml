@@ -25,7 +25,7 @@ jobs:
           node-version: 20
           cache: npm
 
-      - run: npm ci
+      - run: npm ci --legacy-peer-deps
 
       - run: npm run build -- --configuration production --base-href "/SAE_S5_QUALITE_AIR/"
 
