@@ -1,113 +1,120 @@
-@if (isLoading()) {
-      <app-loading-spinner
-        title="Chargement des analyses..."
-        message="Préparation des résultats">
-      </app-loading-spinner>
-    }
+<div class="page-container max-w-6xl mx-auto">
+  <div class="page-header mb-8">
+    <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+      Analyse des determinants de la pollution urbaine
+    </h1>
+    <p class="text-gray-600 dark:text-gray-400">
+      Synthese de la soutenance: pour chaque axe, ce que montre le graphique, les chiffres cles,
+      et l interpretation associee.
+    </p>
+  </div>
 
-    @if (!isLoading()) {
-      <div class="page-container max-w-6xl mx-auto">
-        <div class="page-header mb-8">
-          <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
-            Analyses par axe
-          </h1>
-          <p class="text-gray-600 dark:text-gray-400">
-            Exploration des cinq axes principaux avec indicateurs, graphiques et interprétation.
+  <div class="tabs">
+    @for (tab of tabs(); track tab.id) {
+      <button
+        class="tab-button"
+        [class.tab-active]="tab.id === selectedTab()"
+        (click)="selectTab(tab.id)">
+        <app-icon [name]="tab.icon" iconClass="!w-5 !h-5"></app-icon>
+        <span>{{ tab.label }}</span>
+      </button>
+    }
+  </div>
+
+  @if (activeTab()) {
+    <section class="axis-header">
+      <div class="axis-title">
+        <div class="axis-icon" [style.background]="activeTab()!.accent">
+          <app-icon [name]="activeTab()!.icon" iconClass="!w-6 !h-6 text-white"></app-icon>
+        </div>
+        <div>
+          <h2 class="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+            {{ activeTab()!.label }}
+          </h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400">
+            Question: {{ activeTab()!.question }}
           </p>
         </div>
+      </div>
+      <div class="axis-hypothesis">
+        <span class="hypothesis-label">Hypothese</span>
+        <p>{{ activeTab()!.hypothesis }}</p>
+      </div>
+      <div class="axis-summary">
+        <span class="summary-label">Synthese</span>
+        <p>{{ activeTab()!.summary }}</p>
+      </div>
+    </section>
 
-        <div class="tabs">
-          <div class="pollutant-select">
-            <label for="pollutant">Polluant</label>
-            <select
-              id="pollutant"
-              [value]="selectedPollutant()"
-              (change)="onPollutantChange($event)">
-              @for (option of pollutantOptions; track option.value) {
-                <option [value]="option.value">{{ option.label }} ({{ option.unit }})</option>
-              }
-            </select>
+    <div class="kpi-grid">
+      @for (kpi of activeTab()!.kpis; track kpi.label) {
+        <app-kpi-card
+          [icon]="kpi.icon"
+          [value]="kpi.value"
+          [label]="kpi.label"
+          [subtext]="kpi.subtext"
+          [color]="kpi.color"
+          [animate]="false">
+        </app-kpi-card>
+      }
+    </div>
+
+    <div class="chart-grid">
+      @for (chart of activeTab()!.charts; track chart.title) {
+        <div class="chart-card">
+          <div>
+            <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">{{ chart.title }}</h3>
+            <p class="text-sm text-slate-500 dark:text-slate-400">{{ chart.description }}</p>
           </div>
-          @for (tab of tabs(); track tab.id) {
-            <button
-              class="tab-button"
-              [class.tab-active]="tab.id === selectedAxis()"
-              (click)="selectAxis(tab.id)">
-              <app-icon [name]="tab.icon" iconClass="!w-5 !h-5"></app-icon>
-              <span>{{ tab.label }}</span>
-            </button>
-          }
+          <img
+            class="chart-image"
+            [src]="chart.imageSrc"
+            [alt]="chart.imageAlt"
+            loading="lazy"
+            (click)="openLightbox(chart.imageSrc, chart.imageAlt, chart.footer)"
+          />
+          <p class="chart-footer">{{ chart.footer }}</p>
         </div>
+      }
+    </div>
 
-        @if (activeTab()) {
-          <section class="axis-header">
-            <div class="axis-title">
-              <div class="axis-icon" [style.background]="activeTab()!.accent">
-                <app-icon [name]="activeTab()!.icon" iconClass="!w-6 !h-6 text-white"></app-icon>
-              </div>
-              <div>
-                <h2 class="text-2xl font-semibold text-slate-900 dark:text-slate-100">
-                  {{ activeTab()!.label }}
-                </h2>
-                <p class="text-sm text-slate-500 dark:text-slate-400">
-                  Question: {{ activeTab()!.question }}
-                </p>
-              </div>
-            </div>
-            <div class="axis-hypothesis">
-              <span class="hypothesis-label">Hypothèse</span>
-              <p>{{ activeTab()!.hypothesis }}</p>
-            </div>
-            <div class="axis-pollutant">
-              Analyse pour: <strong>{{ pollutantInfo().name }}</strong> ({{ pollutantInfo().unit }})
-            </div>
-          </section>
+    <div class="insight-grid">
+      <div class="insight-card">
+        <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Points cles</h3>
+        <ul>
+          @for (item of activeTab()!.insights; track item) {
+            <li>{{ item }}</li>
+          }
+        </ul>
+      </div>
+      <div class="insight-card emphasis">
+        <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Interpretation</h3>
+        <p>{{ activeTab()!.interpretation }}</p>
+      </div>
+    </div>
+  }
 
-          <div class="kpi-grid">
-            @for (kpi of activeTab()!.kpis; track kpi.label) {
-              <app-kpi-card
-                [icon]="kpi.icon"
-                [value]="kpi.value"
-                [label]="kpi.label"
-                [subtext]="kpi.subtext"
-                [color]="kpi.color"
-                [animate]="false">
-              </app-kpi-card>
-            }
-          </div>
-
-          <div class="chart-grid">
-            @for (chart of activeTab()!.charts; track chart.title) {
-              <div class="chart-card">
-                <div>
-                  <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">{{ chart.title }}</h3>
-                  <p class="text-sm text-slate-500 dark:text-slate-400">{{ chart.description }}</p>
-                </div>
-                <canvas
-                  baseChart
-                  [type]="chart.type"
-                  [data]="chart.data"
-                  [options]="chart.options">
-                </canvas>
-                <p class="chart-footer">{{ chart.footer }}</p>
-              </div>
-            }
-          </div>
-
-          <div class="insight-grid">
-            <div class="insight-card">
-              <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Points cles</h3>
-              <ul>
-                @for (item of activeTab()!.insights; track item) {
-                  <li>{{ item }}</li>
-                }
-              </ul>
-            </div>
-            <div class="insight-card emphasis">
-              <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Interprétation</h3>
-              <p>{{ activeTab()!.interpretation }}</p>
-            </div>
-          </div>
+  @if (lightboxImage) {
+    <div class="lightbox" (click)="closeLightbox()">
+      <div class="lightbox-content" (click)="$event.stopPropagation()">
+        <div class="lightbox-actions">
+          <button type="button" (click)="zoomOut()">-</button>
+          <button type="button" (click)="resetZoom()">100%</button>
+          <button type="button" (click)="zoomIn()">+</button>
+          <button type="button" class="close" (click)="closeLightbox()">Fermer</button>
+        </div>
+        <img
+          [src]="lightboxImage.src"
+          [alt]="lightboxImage.alt"
+          [class.magnify]="magnifyActive"
+          [style.transform]="'scale(' + (magnifyActive ? (zoomLevel < 1.25 ? 1.25 : zoomLevel) : zoomLevel) + ')'"
+          (mousemove)="onLightboxMove($event)"
+          (mouseleave)="onLightboxLeave()"
+        />
+        @if (lightboxImage.caption) {
+          <p class="lightbox-caption">{{ lightboxImage.caption }}</p>
         }
       </div>
-    }
+    </div>
+  }
+</div>

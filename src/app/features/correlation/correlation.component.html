@@ -59,7 +59,7 @@
             </div>
           </div>
           <div class="heatmap-wrapper">
-            <div class="heatmap" [style.--cols]="selectedVariables().length + 1">
+            <div class="heatmap" [style.--cols]="selectedVariables().length">
               <div class="corner"></div>
               @for (col of selectedVariables(); track col.key) {
                 <div class="col-label">{{ col.label }}</div>

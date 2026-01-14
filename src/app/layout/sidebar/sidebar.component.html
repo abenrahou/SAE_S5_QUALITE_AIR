@@ -40,6 +40,9 @@
           } @else {
             <div>
               <button
+                [routerLink]="item.route"
+                routerLinkActive="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                [routerLinkActiveOptions]="{ exact: false }"
                 class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
                 [title]="item.label">
                 <app-icon [name]="item.icon"></app-icon>
@@ -56,7 +59,8 @@
                     <li>
                       <a
                         [routerLink]="child.route"
-                        routerLinkActive="text-blue-600 dark:text-blue-400 font-medium"
+                        routerLinkActive="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
+                        [routerLinkActiveOptions]="{ exact: true }"
                         class="flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 text-sm text-gray-600 dark:text-gray-400">
                         <app-icon [name]="child.icon" iconClass="!w-4 !h-4"></app-icon>
                         <span>{{ child.label }}</span>
@@ -92,7 +96,7 @@
       (click)="toggleSidebar()"
       class="w-full mt-2 flex items-center justify-center px-3 py-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400"
       title="Réduire la sidebar">
-      <span class="text-xl">{{ isCollapsed() ? '<' : '>' }}</span>
+      <span class="text-xl">{{ isCollapsed() ? '>' : '<' }}</span>
     </button>
   </div>
 </aside>

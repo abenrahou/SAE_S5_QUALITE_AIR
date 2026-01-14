@@ -22,6 +22,46 @@ export const routes: Routes = [
       import('./features/analysis/analysis.component').then((m) => m.AnalysisComponent)
   },
   {
+    path: 'analysis/temporal',
+    loadComponent: () =>
+      import('./features/analysis/analysis.component').then((m) => m.AnalysisComponent)
+  },
+  {
+    path: 'analysis/transport',
+    loadComponent: () =>
+      import('./features/analysis/analysis.component').then((m) => m.AnalysisComponent)
+  },
+  {
+    path: 'analysis/environment',
+    loadComponent: () =>
+      import('./features/analysis/analysis.component').then((m) => m.AnalysisComponent)
+  },
+  {
+    path: 'analysis/multivariate',
+    loadComponent: () =>
+      import('./features/analysis/analysis.component').then((m) => m.AnalysisComponent)
+  },
+  {
+    path: 'analysis/models',
+    loadComponent: () =>
+      import('./features/analysis/analysis.component').then((m) => m.AnalysisComponent)
+  },
+  {
+    path: 'analysis/plan',
+    loadComponent: () =>
+      import('./features/analysis/analysis.component').then((m) => m.AnalysisComponent)
+  },
+  {
+    path: 'analysis/transparency',
+    loadComponent: () =>
+      import('./features/analysis/analysis.component').then((m) => m.AnalysisComponent)
+  },
+  {
+    path: 'analysis/limits',
+    loadComponent: () =>
+      import('./features/analysis/analysis.component').then((m) => m.AnalysisComponent)
+  },
+  {
     path: 'analysis/energy',
     loadComponent: () =>
       import('./features/analysis/analysis.component').then((m) => m.AnalysisComponent)

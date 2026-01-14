@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from './layout/sidebar/sidebar.component';
@@ -52,7 +52,7 @@ export class App implements OnInit {
       error: (error: unknown) => {
         console.error('Error loading datasets:', error);
         this.loadError.set(
-          'Erreur lors du chargement des données. Vérifiez que les fichiers CSV sont dans src/assets/data/.'
+          'Erreur lors du chargement des donnFs. VSifiez que les fichiers CSV sont dans src/assets/data/.'
         );
         this.isLoading.set(false);
       },
@@ -61,4 +61,5 @@ export class App implements OnInit {
       }
     });
   }
+
 }

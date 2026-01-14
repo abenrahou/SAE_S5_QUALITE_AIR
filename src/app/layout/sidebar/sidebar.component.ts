@@ -32,20 +32,26 @@ export class SidebarComponent {
       label: 'Analyses',
       route: '/analysis',
       children: [
-        { icon: 'fire', label: 'Énergie', route: '/analysis/energy' },
-        { icon: 'currency-dollar', label: 'Développement', route: '/analysis/development' },
+        { icon: 'calendar', label: 'Temporal & COVID', route: '/analysis/temporal' },
         { icon: 'building-office-2', label: 'Urbanisation', route: '/analysis/urbanization' },
-        { icon: 'arrow-path', label: 'Renouvelables', route: '/analysis/renewable' },
-        { icon: 'chart-pie', label: 'Niveau dév.', route: '/analysis/level' }
+        { icon: 'currency-dollar', label: 'Developpement', route: '/analysis/development' },
+        { icon: 'scale', label: 'Transport', route: '/analysis/transport' },
+        { icon: 'fire', label: 'Energie', route: '/analysis/energy' },
+        { icon: 'sparkles', label: 'Environnement', route: '/analysis/environment' },
+        { icon: 'beaker', label: 'ACP', route: '/analysis/multivariate' },
+        { icon: 'cpu-chip', label: 'Modeles', route: '/analysis/models' },
+        { icon: 'chart-pie', label: 'Plan d action', route: '/analysis/plan' },
+        { icon: 'information-circle', label: 'Transparence', route: '/analysis/transparency' },
+        { icon: 'chart-bar', label: 'Limites', route: '/analysis/limits' }
       ]
     },
     { icon: 'scale', label: 'Comparaison', route: '/comparison' },
-    { icon: 'calendar', label: 'Évolutions', route: '/temporal' },
-    { icon: 'sparkles', label: 'Corrélations', route: '/correlation' },
-    { icon: 'beaker', label: 'Multivariée', route: '/multivariate' },
-    { icon: 'cpu-chip', label: 'Prédictions', route: '/prediction' },
-    { icon: 'table-cells', label: 'Données', route: '/data' },
-    { icon: 'information-circle', label: 'À propos', route: '/about' }
+    { icon: 'calendar', label: 'Evolutions', route: '/temporal' },
+    { icon: 'sparkles', label: 'Correlations', route: '/correlation' },
+    { icon: 'beaker', label: 'Multivariee', route: '/multivariate' },
+    { icon: 'cpu-chip', label: 'Predictions', route: '/prediction' },
+    { icon: 'table-cells', label: 'Donnees', route: '/data' },
+    { icon: 'information-circle', label: 'A propos', route: '/about' }
   ];
 
   toggleSidebar() {
