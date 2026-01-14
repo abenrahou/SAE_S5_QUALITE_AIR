@@ -85,21 +85,21 @@ export class AnalysisComponent implements OnInit {
           title: 'Evolution 2019-2023',
           description: 'Tendances PM2.5, NO2, O3',
           footer: 'Lecture temporelle avec repere COVID.',
-          imageSrc: '/assets/graphs/1_evolution_temporelle_2019_2023.png',
+          imageSrc: 'assets/graphs/1_evolution_temporelle_2019_2023.png',
           imageAlt: 'Evolution temporelle 2019-2023'
         },
         {
           title: 'Impact COVID',
           description: 'Avant / pendant / apres',
           footer: 'Baisse PM2.5, O3 en hausse pendant COVID.',
-          imageSrc: '/assets/graphs/2_impact_covid_analyse_complete.png',
+          imageSrc: 'assets/graphs/2_impact_covid_analyse_complete.png',
           imageAlt: 'Impact COVID sur les polluants'
         },
         {
           title: 'Matrice de correlations',
           description: 'Relations entre polluants',
           footer: 'Graphique de rapport.',
-          imageSrc: '/assets/graphs/1_matrice_correlations_polluants.png',
+          imageSrc: 'assets/graphs/1_matrice_correlations_polluants.png',
           imageAlt: 'Matrice des correlations des polluants'
         }
       ],
@@ -128,14 +128,14 @@ export class AnalysisComponent implements OnInit {
           title: 'Croissance urbaine',
           description: 'Relation PM2.5 / croissance urbaine',
           footer: 'Slide axe 1.',
-          imageSrc: '/assets/graphs/axe1_q3_croissance.png',
+          imageSrc: 'assets/graphs/axe1_q3_croissance.png',
           imageAlt: 'Croissance urbaine et PM2.5'
         },
         {
           title: 'Taille de ville',
           description: 'PM2.5 selon la taille',
           footer: 'Effet secondaire.',
-          imageSrc: '/assets/graphs/axe1_taille_ville.png',
+          imageSrc: 'assets/graphs/axe1_taille_ville.png',
           imageAlt: 'PM2.5 par taille de ville'
         }
       ],
@@ -164,21 +164,21 @@ export class AnalysisComponent implements OnInit {
           title: 'PIB par habitant',
           description: 'Lecture type Kuznets',
           footer: 'Slide axe 2.',
-          imageSrc: '/assets/graphs/axe2_kuznets_pib.png',
+          imageSrc: 'assets/graphs/axe2_kuznets_pib.png',
           imageAlt: 'PIB par habitant et PM2.5'
         },
         {
           title: 'Tertiarisation',
           description: 'Part des services dans le PIB',
           footer: 'Effet protecteur.',
-          imageSrc: '/assets/graphs/axe2_q4_services.png',
+          imageSrc: 'assets/graphs/axe2_q4_services.png',
           imageAlt: 'Part des services et PM2.5'
         },
         {
           title: 'Heatmap developpement',
           description: 'Analyse croisee',
           footer: 'Graphique de rapport.',
-          imageSrc: '/assets/graphs/chi2_developpement_heatmap.png',
+          imageSrc: 'assets/graphs/chi2_developpement_heatmap.png',
           imageAlt: 'Heatmap developpement'
         }
       ],
@@ -207,14 +207,14 @@ export class AnalysisComponent implements OnInit {
           title: 'Reseau ferre',
           description: 'Comparaison par categories',
           footer: 'Slide axe 3.',
-          imageSrc: '/assets/graphs/axe3_reseau_ferre.png',
+          imageSrc: 'assets/graphs/axe3_reseau_ferre.png',
           imageAlt: 'Reseau ferre et polluants'
         },
         {
           title: 'Trafic aerien',
           description: 'Proxy mobilite',
           footer: 'Effet faible.',
-          imageSrc: '/assets/graphs/4_transport_no2_vs_pm25.png',
+          imageSrc: 'assets/graphs/4_transport_no2_vs_pm25.png',
           imageAlt: 'Trafic aerien, PM2.5 et NO2'
         }
       ],
@@ -243,21 +243,21 @@ export class AnalysisComponent implements OnInit {
           title: 'Charbon vs SO2',
           description: 'Lien direct',
           footer: 'Slide axe 4.',
-          imageSrc: '/assets/graphs/11_charbon_so2.png',
+          imageSrc: 'assets/graphs/11_charbon_so2.png',
           imageAlt: 'Part du charbon et SO2'
         },
         {
           title: 'Charbon vs PM2.5',
           description: 'Decouplage majeur',
           footer: 'Slide axe 4.',
-          imageSrc: '/assets/graphs/Part du charbon et niveaux de PM2.5 - 13 janvier 2026.png',
+          imageSrc: 'assets/graphs/Part du charbon et niveaux de PM2.5 - 13 janvier 2026.png',
           imageAlt: 'Part du charbon et PM2.5'
         },
         {
           title: 'Impacts differencies',
           description: 'PM2.5, SO2, NO2',
           footer: 'Slide axe 4.',
-          imageSrc: '/assets/graphs/6_energie_impacts_differencies.png',
+          imageSrc: 'assets/graphs/6_energie_impacts_differencies.png',
           imageAlt: 'Impacts differencies du charbon'
         }
       ],
@@ -286,7 +286,7 @@ export class AnalysisComponent implements OnInit {
           title: 'Foret vs intensite',
           description: 'Effet croise',
           footer: 'Slide axe 5.',
-          imageSrc: '/assets/graphs/axe5_forets_industrie_croise.png',
+          imageSrc: 'assets/graphs/axe5_forets_industrie_croise.png',
           imageAlt: 'Forets et intensite d activite'
         }
       ],
@@ -315,14 +315,14 @@ export class AnalysisComponent implements OnInit {
           title: 'ACP simplifiee',
           description: 'Lecture soutenance',
           footer: 'Slide ACP.',
-          imageSrc: '/assets/graphs/7_acp_simplifiee_oral.png',
+          imageSrc: 'assets/graphs/7_acp_simplifiee_oral.png',
           imageAlt: 'ACP simplifiee'
         },
         {
           title: 'Cercle de correlation',
           description: 'Lecture detaillee',
           footer: 'Graphique de rapport.',
-          imageSrc: '/assets/graphs/acp_cercle_correlation_biplot.png',
+          imageSrc: 'assets/graphs/acp_cercle_correlation_biplot.png',
           imageAlt: 'ACP cercle de correlation'
         }
       ],
@@ -351,28 +351,28 @@ export class AnalysisComponent implements OnInit {
           title: 'R2 comparatif',
           description: 'Jeu de test',
           footer: 'Slide modeles.',
-          imageSrc: '/assets/graphs/8_modeles_r2_comparaison_oral.png',
+          imageSrc: 'assets/graphs/8_modeles_r2_comparaison_oral.png',
           imageAlt: 'Comparaison des R2'
         },
         {
           title: 'Modeles multi-polluants',
           description: 'Comparatif global',
           footer: 'Graphique de rapport.',
-          imageSrc: '/assets/graphs/3_modeles_comparatifs_multipolluants.png',
+          imageSrc: 'assets/graphs/3_modeles_comparatifs_multipolluants.png',
           imageAlt: 'Modeles comparatifs multi-polluants'
         },
         {
           title: 'Importance des variables',
           description: 'Poids relatif',
           footer: 'Graphique de rapport.',
-          imageSrc: '/assets/graphs/model_regression_importance.png',
+          imageSrc: 'assets/graphs/model_regression_importance.png',
           imageAlt: 'Importance des variables'
         },
         {
           title: 'Predictions',
           description: 'Observations vs predictions',
           footer: 'Graphique de rapport.',
-          imageSrc: '/assets/graphs/model_regression_predictions.png',
+          imageSrc: 'assets/graphs/model_regression_predictions.png',
           imageAlt: 'Predictions des modeles'
         }
       ],
@@ -401,7 +401,7 @@ export class AnalysisComponent implements OnInit {
           title: 'Plan d action',
           description: 'Hierarchisation',
           footer: 'Slide plan d action.',
-          imageSrc: '/assets/graphs/5_choix_indicateurs_plan_action.png',
+          imageSrc: 'assets/graphs/5_choix_indicateurs_plan_action.png',
           imageAlt: 'Plan d action'
         }
       ],
@@ -430,14 +430,14 @@ export class AnalysisComponent implements OnInit {
           title: 'Tentatives non abouties',
           description: 'Variables explorees',
           footer: 'Slide transparence.',
-          imageSrc: '/assets/graphs/3_tentatives_non_abouties.png',
+          imageSrc: 'assets/graphs/3_tentatives_non_abouties.png',
           imageAlt: 'Tentatives non abouties'
         },
         {
           title: 'Heatmap developpement',
           description: 'Analyse croisee',
           footer: 'Graphique de rapport.',
-          imageSrc: '/assets/graphs/chi2_developpement_heatmap.png',
+          imageSrc: 'assets/graphs/chi2_developpement_heatmap.png',
           imageAlt: 'Heatmap developpement'
         }
       ],
@@ -466,7 +466,7 @@ export class AnalysisComponent implements OnInit {
           title: 'Profils multi-polluants',
           description: 'Comparaison des villes',
           footer: 'Graphique de rapport.',
-          imageSrc: '/assets/graphs/5_profils_multipolluants_villes.png',
+          imageSrc: 'assets/graphs/5_profils_multipolluants_villes.png',
           imageAlt: 'Profils multi-polluants'
         },
         

@@ -52,7 +52,7 @@ export class App implements OnInit {
       error: (error: unknown) => {
         console.error('Error loading datasets:', error);
         this.loadError.set(
-          'Erreur lors du chargement des donnFs. VSifiez que les fichiers CSV sont dans src/assets/data/.'
+          'Erreur lors du chargement des donnFs. VSifiez que les fichiers CSV sont dans srcassets/data/.'
         );
         this.isLoading.set(false);
       },
